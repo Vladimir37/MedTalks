@@ -1,0 +1,16 @@
+{
+  "name": "MedTalks",
+  "dependencies": {
+  	"express": "*",
+    "jade": "*",
+    "body-parser": "*",
+    "formidable": "*",
+    "cookie-parser": "*",
+    "easy-encryption": "*",
+    "random-token": "*",
+    "mysql": "*",
+    "sequelize": "*",
+    "nodemailer": "*",
+    "serve-favicon": "*"
+  }
+}
