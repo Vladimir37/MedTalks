@@ -1,0 +1,7 @@
+{
+	"login": "root",
+	"pass": "node_db",
+	"name": "medtalks",
+	"dialect": "mysql",
+	"port": 3306
+}

@@ -1,8 +1,10 @@
 var Sequelize = require('sequelize');
 
-var sequelize = new Sequelize('medtalks', 'root', 'node_db', {
-	dialect: 'mysql',
-	port: 3306
+var db_data = require('./db_connect');
+
+var sequelize = new Sequelize(db_data.name, db_data.login, db_data.pass, {
+	dialect: db_data.dialect,
+	port: db_data.port
 });
 
 sequelize.authenticate().then(function() {
@@ -20,8 +22,10 @@ tables.users = sequelize.define('users', {
 		autoIncrement: true
 	},
 	name: {
-		type: Sequelize.TEXT,
-		unique: true
+		type: Sequelize.TEXT
+	},
+	pass: {
+		type: Sequelize.TEXT
 	},
 	status: {
 		type: Sequelize.INTEGER,
@@ -42,7 +46,6 @@ tables.articles = sequelize.define('articles', {
 	},
 	name: {
 		type: Sequelize.TEXT,
-		unique: true
 	},
 	text: Sequelize.TEXT,
 	hub: Sequelize.INTEGER,
@@ -76,16 +79,16 @@ tables.hubs = sequelize.define('hubs', {
 		autoIncrement: true
 	},
 	name: {
-		type: Sequelize.TEXT,
-		unique: true
+		type: Sequelize.TEXT
 	}
 });
 
-// for(table in tables) {
-// 	console.log(tables.hubs);
-// 	table.sync({forsed: true}).success(function() {
-// 		console.log('Таблица успешно синхронизирована');
-// 	}).error(function(err) {
-// 		console.log('Ошибка синхронизации: ' + err);
-// 	});
-// };
+for(table in tables) {
+	tables[table].sync({forsed: true}).then(function(result) {
+		console.log('Таблица ' + result.name + ' успешно синхронизирована');
+		}, function(err) {
+		console.log('Ошибка синхронизации: ' + err);
+	});
+};
+
+exports.tables = tables;
