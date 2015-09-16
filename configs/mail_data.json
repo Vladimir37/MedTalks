@@ -1,0 +1,6 @@
+{
+	"service": "mail.ru",
+	"login": "medtalks",
+	"pass": "password_test_password",
+	"from": "medtalks@mail.ru"
+}

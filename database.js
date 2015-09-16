@@ -1,6 +1,6 @@
 var Sequelize = require('sequelize');
 
-var db_data = require('./db_connect');
+var db_data = require('./configs/db_connect');
 
 var sequelize = new Sequelize(db_data.name, db_data.login, db_data.pass, {
 	dialect: db_data.dialect,
@@ -21,12 +21,8 @@ tables.users = sequelize.define('users', {
 		primaryKey: true,
 		autoIncrement: true
 	},
-	name: {
-		type: Sequelize.TEXT
-	},
-	pass: {
-		type: Sequelize.TEXT
-	},
+	name: Sequelize.TEXT,
+	pass: Sequelize.TEXT,
 	status: {
 		type: Sequelize.INTEGER,
 		defaultValue: 0
@@ -44,9 +40,7 @@ tables.articles = sequelize.define('articles', {
 		primaryKey: true,
 		autoIncrement: true
 	},
-	name: {
-		type: Sequelize.TEXT,
-	},
+	name: Sequelize.TEXT,
 	text: Sequelize.TEXT,
 	hub: Sequelize.INTEGER,
 	author: Sequelize.INTEGER,
@@ -78,9 +72,7 @@ tables.hubs = sequelize.define('hubs', {
 		primaryKey: true,
 		autoIncrement: true
 	},
-	name: {
-		type: Sequelize.TEXT
-	}
+	name: Sequelize.TEXT
 });
 
 for(table in tables) {
