@@ -1,0 +1,4 @@
+{
+	"port": 3000,
+	"encrypt_key": "secret_key_for_medtalks"
+}

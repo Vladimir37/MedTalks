@@ -21,6 +21,7 @@ tables.users = sequelize.define('users', {
 		primaryKey: true,
 		autoIncrement: true
 	},
+	mail: Sequelize.TEXT,
 	name: Sequelize.TEXT,
 	pass: Sequelize.TEXT,
 	status: {
