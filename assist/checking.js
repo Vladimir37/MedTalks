@@ -3,6 +3,7 @@ var db = require('./database');
 //Регулярные выражения
 var re_name = new RegExp('^[a-zA-Z0-9_]+$');
 var re_mail = new RegExp('.+@.+\..+');
+var re_confirm = new RegExp('^[0-9]+\_[0-9]+$');
 
 //Проверка имени на занятость
 function name_check(enter_name) {
@@ -51,4 +52,27 @@ function all_check(name, mail, pass) {
 	}
 };
 
+//Проверка кода подтверждения
+function confirm(key) {
+	return new Promise(function(res, rej) {
+		if(re_confirm.test(key)) {
+			var key_arr = key.split('_');
+			db.tables.users.findOne({where: {id: key_arr[1], key: key_arr[0]}}).then(function(result) {
+				if(result) {
+					res(key_arr[1]);
+				}
+				else {
+					rej('Key incorrect');
+				}
+			}, function(err) {
+				rej('Server error')
+			});
+		}
+		else {
+			rej('Key incorrect');
+		}
+	});
+};
+
 exports.fullCheck = all_check;
+exports.confirm = confirm;

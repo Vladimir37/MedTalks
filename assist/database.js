@@ -1,6 +1,6 @@
 var Sequelize = require('sequelize');
 
-var db_data = require('./configs/db_connect');
+var db_data = require('../configs/db_connect');
 
 var sequelize = new Sequelize(db_data.name, db_data.login, db_data.pass, {
 	dialect: db_data.dialect,
@@ -32,7 +32,7 @@ tables.users = sequelize.define('users', {
 		type: Sequelize.INTEGER,
 		defaultValue: 0
 	},
-	key: Sequelize.INTEGER
+	key: Sequelize.TEXT
 });
 
 tables.articles = sequelize.define('articles', {

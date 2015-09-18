@@ -1,5 +1,6 @@
 var nodemailer = require('nodemailer');
-var config = require('./config/mail_data')
+
+var config = require('../configs/mail_data');
 
 //Указание данных подключения
 var transporter = nodemailer.createTransport({

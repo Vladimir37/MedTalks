@@ -1,2 +1,2 @@
-var db = require('./database');
+var db = require('./assist/database');
 
