@@ -1,4 +1,5 @@
 {
 	"port": 3000,
-	"encrypt_key": "secret_key_for_medtalks"
+	"encrypt_key": "secret_key_for_medtalks",
+	"auth_key": "key_for_auth"
 }

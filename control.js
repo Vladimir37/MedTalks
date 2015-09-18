@@ -7,8 +7,12 @@ var checking = require('./assist/checking');
 var mail = require('./assist/mail').send;
 
 //Параметры шифрования
-var crypt = new Crypt({
+var crypt_pass = new Crypt({
 	secret: config.encrypt_key, 
+	iterations: 3700
+});
+var crypt_auth = new Crypt({
+	secret: config.auth_key, 
 	iterations: 3700
 });
 
@@ -18,7 +22,7 @@ function registration(req, res) {
 		//Дальнейшая регистрация
 		db.tables.users.create({
 			name: req.body.login,
-			pass: crypt.encrypt(req.body.pass),
+			pass: crypt_pass.encrypt(req.body.pass),
 			mail: req.body.mail,
 			key: random(12)
 		}).then(function(result) {
@@ -53,5 +57,29 @@ function confirm(res, key) {
 	});
 };
 
+//Авторизация
+function auth(req, res) {
+	var enter_login = req.body.login;
+	var enter_pass = req.body.pass;
+	db.tables.users.findOne({where: {mail: enter_login}}).then(function(result) {
+		if(result && crypt_pass.decrypt(result.pass) == enter_pass) {
+			var cookie_source = result.name + '#' + result.status;
+			var cookie_data = {};
+			if(req.params.remember) {
+				cookie_data.maxAge = 1210000
+			}
+			res.cookie('mt_login', crypt_auth.encrypt(cookie_source), cookie_data);
+			res.redirect('/');
+		}
+		else {
+			res.redirect('/login#incorrect');
+		}
+	}, function(err) {
+		console.log(err);
+		res.redirect('/login#error');
+	});
+};
+
 exports.registration = registration;
 exports.confirm = confirm;
+exports.auth = auth;
