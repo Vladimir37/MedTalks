@@ -45,6 +45,7 @@ tables.articles = sequelize.define('articles', {
 	text: Sequelize.TEXT,
 	hub: Sequelize.INTEGER,
 	author: Sequelize.INTEGER,
+	status: Sequelize.INTEGER,
 	rating: {
 		type: Sequelize.INTEGER,
 		defaultValue: 0

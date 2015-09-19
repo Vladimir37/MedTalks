@@ -1,10 +1,14 @@
 var Crypt = require('easy-encryption');
 var random = require('random-token').create('0987654321');
+var Redis = require('redis');
 
 var db = require('./assist/database');
 var config = require('./configs/app_config');
 var checking = require('./assist/checking');
 var mail = require('./assist/mail').send;
+
+//Создание Redis-клиента
+var redis = Redis.createClient();
 
 //Параметры шифрования
 var crypt_pass = new Crypt({
@@ -63,12 +67,13 @@ function auth(req, res) {
 	var enter_pass = req.body.pass;
 	db.tables.users.findOne({where: {mail: enter_login}}).then(function(result) {
 		if(result && crypt_pass.decrypt(result.pass) == enter_pass) {
-			var cookie_source = result.name + '#' + result.status;
 			var cookie_data = {};
-			if(req.params.remember) {
-				cookie_data.maxAge = 1210000
+			if(req.body.remember) {
+				cookie_data.maxAge = 1210000000
 			}
-			res.cookie('mt_login', crypt_auth.encrypt(cookie_source), cookie_data);
+			redis.set(result.name, result.status);
+			redis.expire(result.name, 1210000);
+			res.cookie('mt_login', crypt_auth.encrypt(result.name), cookie_data);
 			res.redirect('/');
 		}
 		else {

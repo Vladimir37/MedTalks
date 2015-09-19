@@ -10,6 +10,7 @@
     "random-token": "*",
     "mysql": "*",
     "sequelize": "*",
+    "redis": "*",
     "nodemailer": "*",
     "serve-favicon": "*"
   }

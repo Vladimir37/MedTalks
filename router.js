@@ -4,6 +4,7 @@ var cookie = require('cookie-parser');
 
 var render = require('./render');
 var control = require('./control');
+var authent = require('./assist/authent');
 
 var app = express();
 app.use(parser());
@@ -13,7 +14,12 @@ app.use(cookie());
 
 //Главная ---------------------------------------------
 app.get('/', function(req, res) {
-	res.end('Simple');
+	authent(req).then(function(status) {
+		res.end(status);
+	}, function(err) {
+		res.end('FAIL');
+		console.log(err);
+	})
 });
 //Регистрация
 app.get('/registration', function(req, res) {
