@@ -17,24 +17,37 @@ app.get('/', function(req, res) {
 	authent(req).then(function(status) {
 		res.end(status);
 	}, function(err) {
-		res.end('FAIL');
-		console.log(err);
-	})
+		res.end('Not autorized');
+	});
 });
 //Регистрация
 app.get('/registration', function(req, res) {
-	res.end('<form method="post"><input type="text" name="login" placeholder="login" required><br><input type="password" name="pass" placeholder="pass" required><br><input type="text" name="mail" placeholder="mail" required><br><input type="submit" value="Submit"></form>')
+	render.jade(res, 'registration');
 });
 //Авторизация
 app.get('/login', function(req, res) {
-	res.end('<form method="post"><input type="text" name="login" placeholder="login" required><br><input type="password" name="pass" placeholder="pass" required><br><input type="checkbox" name="remember"><br><input type="submit" value="Submit"></form>');
+	render.jade(res, 'login');
 });
-
-//Служебные ---------------------------------------------
-
-//Подтверждение регистрации
-app.get('/confirm/:key', function(req, res) {
-	control.confirm(res, req.params.key);
+//Создание статьи
+app.get('/create_article', function(req, res) {
+	authent(req).then(function(status) {
+		render.jade(res, 'create_article');
+	}, function(err) {
+		render.error(res);
+	});
+});
+//Создание хаба
+app.get('/create_hub', function(req, res) {
+	authent(req).then(function(status) {
+		if(status == 4) {
+			render.jade(res, 'create_hub');
+		}
+		else {
+			render.error(res);
+		}
+	}, function(err) {
+		render.error(res);
+	});
 });
 
 //POST-запросы ---------------------------------------------
@@ -47,5 +60,34 @@ app.post('/registration', function(req, res) {
 app.post('/login', function(req, res) {
 	control.auth(req, res);
 })
+//Создание хаба
+app.post('/create_hub', function(req, res) {
+	authent(req).then(function(status) {
+		if(status == 4) {
+			control.hub(req, res);
+		}
+		else {
+			render.error(res);
+		}
+	}, function(err) {
+		render.error(res);
+	});
+});
+
+//Служебные ---------------------------------------------
+
+//Подтверждение регистрации
+app.get('/confirm/:key', function(req, res) {
+	control.confirm(res, req.params.key);
+});
+//Ресурсы
+app.get('/source/*', function(req, res) {
+	render.source(res, req.url);
+});
+
+//Ошибка 404
+app.get('*', function(req, res) {
+	render.error(res);
+});
 
 exports.app = app;

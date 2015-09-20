@@ -32,6 +32,10 @@ tables.users = sequelize.define('users', {
 		type: Sequelize.INTEGER,
 		defaultValue: 0
 	},
+	ban: {
+		type: Sequelize.INTEGER,
+		defaultValue: 0
+	},
 	key: Sequelize.TEXT
 });
 
@@ -41,7 +45,7 @@ tables.articles = sequelize.define('articles', {
 		primaryKey: true,
 		autoIncrement: true
 	},
-	name: Sequelize.TEXT,
+	title: Sequelize.TEXT,
 	text: Sequelize.TEXT,
 	hub: Sequelize.INTEGER,
 	author: Sequelize.INTEGER,

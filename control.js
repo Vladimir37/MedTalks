@@ -2,6 +2,7 @@ var Crypt = require('easy-encryption');
 var random = require('random-token').create('0987654321');
 var Redis = require('redis');
 
+var render = require('./render');
 var db = require('./assist/database');
 var config = require('./configs/app_config');
 var checking = require('./assist/checking');
@@ -85,6 +86,17 @@ function auth(req, res) {
 	});
 };
 
+//Создание хаба
+function createHub(req, res) {
+	db.tables.hubs.create({name: req.body.name}).then(function() {
+		render.jade(res, 'success/hub');
+	}, function(err) {
+		console.log(err);
+		render.jade(res, 'errors/eServer');
+	});
+};
+
 exports.registration = registration;
 exports.confirm = confirm;
 exports.auth = auth;
+exports.hub = createHub;
