@@ -1,7 +1,17 @@
 h1 Создать статью
-form(method="post")
+form(method="post" enctype="multipart/form-data")
 	input(type="text" name="title" placeholder="Название статьи" required)
 	br
 	textarea(name="text" placeholder="Текст статьи")
+	br
+	select(name="hub")
+		- for(var i = 0; i < data0.length; i++)
+			option(value=data0[i].id)=data0[i].name
+	br
+	input(type="file" name="f1")
+	br
+	input(type="file" name="f2")
+	br
+	input(type="file" name="f3")
 	br
 	input(type="submit" value="Отправить")

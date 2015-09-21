@@ -2,17 +2,21 @@ var Sequelize = require('sequelize');
 
 var db_data = require('../configs/db_connect');
 
+//Данные подключения
 var sequelize = new Sequelize(db_data.name, db_data.login, db_data.pass, {
 	dialect: db_data.dialect,
 	port: db_data.port
 });
 
+//Проверка подключения
 sequelize.authenticate().then(function() {
 	console.log('Подключение установлено!');
 }, function(err) {
 	console.log('Ошибка подключения: ' + err);
 });
 
+
+//Инициализация таблиц
 var tables = {};
 
 tables.users = sequelize.define('users', {
@@ -47,6 +51,7 @@ tables.articles = sequelize.define('articles', {
 	},
 	title: Sequelize.TEXT,
 	text: Sequelize.TEXT,
+	img: Sequelize.TEXT,
 	hub: Sequelize.INTEGER,
 	author: Sequelize.INTEGER,
 	status: Sequelize.INTEGER,
@@ -81,6 +86,7 @@ tables.hubs = sequelize.define('hubs', {
 	name: Sequelize.TEXT
 });
 
+//Синхронизация и создание всех таблиц
 for(table in tables) {
 	tables[table].sync({forsed: true}).then(function(result) {
 		console.log('Таблица ' + result.name + ' успешно синхронизирована');
@@ -89,4 +95,14 @@ for(table in tables) {
 	});
 };
 
+//Возвращение только одного массива с названиями из выборки
+function select(arr, name) {
+	var result = [];
+	for(var i = 0; i < arr.length; i++) {
+		result[i] = arr[i][name];
+	}
+	return result;
+};
+
 exports.tables = tables;
+exports.select = select;

@@ -1,6 +1,7 @@
 var Crypt = require('easy-encryption');
 var random = require('random-token').create('0987654321');
 var Redis = require('redis');
+var formidable = require('formidable');
 
 var render = require('./render');
 var db = require('./assist/database');
@@ -96,7 +97,23 @@ function createHub(req, res) {
 	});
 };
 
+//Создание статьи
+function createArticle(req, res, status) {
+	if(status == 0) {
+		render.jade(res, 'errors/eConfirm');
+	}
+	else {
+		var form = new formidable.IncomingForm();
+		form.parse(req, function(err, fields, files) {
+			console.log(fields);
+			console.log(files);
+			res.end('END');
+		})
+	}
+};
+
 exports.registration = registration;
 exports.confirm = confirm;
 exports.auth = auth;
 exports.hub = createHub;
+exports.create_article = createArticle;

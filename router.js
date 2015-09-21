@@ -3,6 +3,7 @@ var parser = require('body-parser');
 var cookie = require('cookie-parser');
 
 var render = require('./render');
+var pages = require('./assist/pages');
 var control = require('./control');
 var authent = require('./assist/authent');
 
@@ -31,7 +32,7 @@ app.get('/login', function(req, res) {
 //Создание статьи
 app.get('/create_article', function(req, res) {
 	authent(req).then(function(status) {
-		render.jade(res, 'create_article');
+		pages.create_article(res);
 	}, function(err) {
 		render.error(res);
 	});
@@ -69,6 +70,14 @@ app.post('/create_hub', function(req, res) {
 		else {
 			render.error(res);
 		}
+	}, function(err) {
+		render.error(res);
+	});
+});
+//Создание статьи
+app.post('/create_article', function(req, res) {
+	authent(req).then(function(status) {
+		control.create_article(req, res, status);
 	}, function(err) {
 		render.error(res);
 	});

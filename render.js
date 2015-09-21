@@ -6,6 +6,9 @@ var db = require('./assist/database');
 //Рендер Jade
 function renderJade(res, name) {
 	var jade_data = {};
+	for(var i = 0; i < arguments.length - 2; i++) {
+		jade_data['data' + i] = arguments[i + 2];
+	};
 	jade.renderFile('front/pages/' + name + '.jade', jade_data, function(err, result) {
 		if(err) {
 			console.log(err);
