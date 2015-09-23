@@ -2,6 +2,7 @@ var Crypt = require('easy-encryption');
 var random = require('random-token').create('0987654321');
 var Redis = require('redis');
 var formidable = require('formidable');
+var mime = require('mime');
 
 var render = require('./render');
 var db = require('./assist/database');
@@ -103,10 +104,14 @@ function createArticle(req, res, status) {
 		render.jade(res, 'errors/eConfirm');
 	}
 	else {
-		var form = new formidable.IncomingForm();
+		var form = new formidable.IncomingForm({encoding: 'utf-8', uploadDir: 'temp'});
 		form.parse(req, function(err, fields, files) {
-			console.log(fields);
-			console.log(files);
+			//mime.extension(files.f1.type);
+			//Проверка изображений по типу
+			console.log(files.f1);
+			for(key in files) {
+
+			}
 			res.end('END');
 		})
 	}

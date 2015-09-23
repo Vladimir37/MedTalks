@@ -4,6 +4,7 @@ var db = require('./database');
 var re_name = new RegExp('^[a-zA-Z0-9_]+$');
 var re_mail = new RegExp('.+@.+\..+');
 var re_confirm = new RegExp('^[0-9]+\_[0-9]+$');
+var re_file = new RegExp('^image/');
 
 //Проверка имени на занятость
 function name_check(enter_name) {
@@ -74,5 +75,16 @@ function confirm(key) {
 	});
 };
 
+//Проверка типа загруженного файла и возврат полного названия
+function fileType(file) {
+	if(re_file.test(file.type) && file.size < 5242880) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
 exports.fullCheck = all_check;
 exports.confirm = confirm;
+exports.file = fileType;

@@ -12,6 +12,7 @@
     "sequelize": "*",
     "redis": "*",
     "nodemailer": "*",
-    "serve-favicon": "*"
+    "serve-favicon": "*",
+    "mime": "*"
   }
 }
