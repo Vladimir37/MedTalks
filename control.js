@@ -2,7 +2,8 @@ var Crypt = require('easy-encryption');
 var random = require('random-token').create('0987654321');
 var Redis = require('redis');
 var formidable = require('formidable');
-var mime = require('mime');
+var fs = require('fs');
+var ei = require('easyimage');
 
 var render = require('./render');
 var db = require('./assist/database');
@@ -104,16 +105,65 @@ function createArticle(req, res, status) {
 		render.jade(res, 'errors/eConfirm');
 	}
 	else {
-		var form = new formidable.IncomingForm({encoding: 'utf-8', uploadDir: 'temp'});
+		var form = new formidable.IncomingForm({encoding: 'utf-8', uploadDir: 'temp', keepExtensions: true});
 		form.parse(req, function(err, fields, files) {
-			//mime.extension(files.f1.type);
-			//Проверка изображений по типу
-			console.log(files.f1);
+			//Обработка изображений
+			var valid_files = [];
+			//Валидация файлов
 			for(key in files) {
-
-			}
-			res.end('END');
-		})
+				if(checking.file(files[key])) {
+					valid_files.push(files[key])
+				}
+			};
+			//Получение автора
+			var author_id;
+			var author = crypt_auth.decrypt(req.cookies.mt_login);
+			db.tables.users.findOne({where: {name: author}}).then(function(result) {
+				var author_id = result.id;
+				//Определение статуса статьи
+				var article_status;
+				if(fields.draft) {
+					article_status = 0
+				}
+				else if(status == 1) {
+					article_status = 1
+				}
+				else {
+					article_status = 2
+				}
+				//Создание записи в базе
+				db.tables.articles.create({
+					title: fields.title,
+					text: fields.text,
+					tags: fields.tags,
+					hub: fields.hub,
+					author: author_id,
+					status: article_status
+				}).then(function(result) {
+					render.jade(res, 'success/article');
+					var article_id = result.id;
+					fs.mkdir('front/source/illustrations/' + article_id, function(err) {
+						if(err) {
+							console.log(err);
+						}
+						else {
+							for(var i = 0; i < valid_files.length; i++) {
+								//Создание валидных изображений
+								for(var i = 0; i < valid_files.length; i++) {
+									ei.convert({
+										src: valid_files[i].path,
+										dst: './front/source/illustrations/' + article_id + '/img' + i + '.png'
+									});
+								}
+							}
+						}
+					})
+				});
+			}, function(err) {
+				console.log(err);
+				render.jade(res, 'errors/eServer');
+			});
+		});
 	}
 };
 

@@ -13,6 +13,6 @@
     "redis": "*",
     "nodemailer": "*",
     "serve-favicon": "*",
-    "mime": "*"
+    "easyimage": "*"
   }
 }

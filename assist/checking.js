@@ -75,7 +75,7 @@ function confirm(key) {
 	});
 };
 
-//Проверка типа загруженного файла и возврат полного названия
+//Проверка типа загруженного файла и его размера
 function fileType(file) {
 	if(re_file.test(file.type) && file.size < 5242880) {
 		return true;

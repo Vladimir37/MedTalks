@@ -51,7 +51,7 @@ tables.articles = sequelize.define('articles', {
 	},
 	title: Sequelize.TEXT,
 	text: Sequelize.TEXT,
-	img: Sequelize.TEXT,
+	tags: Sequelize.TEXT,
 	hub: Sequelize.INTEGER,
 	author: Sequelize.INTEGER,
 	status: Sequelize.INTEGER,

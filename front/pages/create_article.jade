@@ -2,11 +2,13 @@ h1 Создать статью
 form(method="post" enctype="multipart/form-data")
 	input(type="text" name="title" placeholder="Название статьи" required)
 	br
-	textarea(name="text" placeholder="Текст статьи")
+	textarea(name="text" placeholder="Текст статьи" required)
 	br
 	select(name="hub")
 		- for(var i = 0; i < data0.length; i++)
 			option(value=data0[i].id)=data0[i].name
+	br
+	input(type="text" name="tags" placeholder="Теги через запятую" required)
 	br
 	input(type="file" name="f1")
 	br
