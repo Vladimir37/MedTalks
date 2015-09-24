@@ -1,9 +1,12 @@
-h1 Черновик
-- if(data0 == null)
-	h2 В черновике нет статей
-- else
-	- for(var i = 0; i < data0.length; i++)
-		h3=data0[i].title
-		p=data0[i].text
-		a(href="/draft/"+data0[i].id)
-			input(type="button" value="Редактировать")
+extends layout
+
+block content
+	h1 Черновик
+	- if(data0 == null)
+		h2 В черновике нет статей
+	- else
+		- for(var i = 0; i < data0.length; i++)
+			h3=data0[i].title
+			p=data0[i].text
+			a(href="/draft/"+data0[i].id)
+				input(type="button" value="Редактировать")

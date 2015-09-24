@@ -29,6 +29,10 @@ app.get('/registration', function(req, res) {
 app.get('/login', function(req, res) {
 	render.jade(res, 'login');
 });
+//Просмотр статьи
+app.get('/article/:name', function(req, res) {
+	pages.article(req, res);
+});
 //Просмотр черновика
 app.get('/draft', function(req, res) {
 	authent(req).then(function(status) {

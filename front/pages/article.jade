@@ -1,0 +1,7 @@
+extends layout
+
+block content
+	h1=data0.title
+	p Создано #{data0.updatedAt}
+	p Теги: #{data0.tags}
+	p!=data0.text
