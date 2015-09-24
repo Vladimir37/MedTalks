@@ -1,10 +1,19 @@
+var Crypt = require('easy-encryption');
+
 var db = require('./database');
+var config = require('./../configs/app_config');
 
 //Регулярные выражения
 var re_name = new RegExp('^[a-zA-Z0-9_]+$');
 var re_mail = new RegExp('.+@.+\..+');
 var re_confirm = new RegExp('^[0-9]+\_[0-9]+$');
 var re_file = new RegExp('^image/');
+
+//Параметры шифрования
+var crypt_auth = new Crypt({
+	secret: config.auth_key, 
+	iterations: 3700
+});
 
 //Проверка имени на занятость
 function name_check(enter_name) {
@@ -85,6 +94,26 @@ function fileType(file) {
 	}
 }
 
+//Возврат номера автора по кукам
+function user_id(req) {
+	return new Promise(function(resolve, reject) {
+		var user_id;
+		var user = crypt_auth.decrypt(req.cookies.mt_login);
+		db.tables.users.findOne({where: {name: user}}).then(function(result) {
+			if(result != null) {
+				var user_id = result.id;
+				resolve(user_id);
+			}
+			else {
+				reject('Not authorized');
+			}
+		}, function(err) {
+			reject('Not authorized')
+		});
+	});
+};
+
 exports.fullCheck = all_check;
 exports.confirm = confirm;
 exports.file = fileType;
+exports.user = user_id;

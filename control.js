@@ -41,7 +41,7 @@ function registration(req, res) {
 		}, function(err) {
 			//Ошибка базы
 			console.log(err);
-			res.redirect('/registration#server_error');
+			render.server(res);
 		});
 	}, function(err) {
 		//Ошибка: не все поля заполнены верно
@@ -57,7 +57,7 @@ function confirm(res, key) {
 			res.redirect('/confirm#success');
 		}, function(err) {
 			console.log(err);
-			res.redirect('/confirm#server_error');
+			render.server(res);
 		})
 	}, function(err) {
 		console.log(err);
@@ -71,21 +71,27 @@ function auth(req, res) {
 	var enter_pass = req.body.pass;
 	db.tables.users.findOne({where: {mail: enter_login}}).then(function(result) {
 		if(result && crypt_pass.decrypt(result.pass) == enter_pass) {
-			var cookie_data = {};
-			if(req.body.remember) {
-				cookie_data.maxAge = 1210000000
+			if(result.status == 0) {
+				var cookie_data = {};
+				if(req.body.remember) {
+					cookie_data.maxAge = 1210000000
+				}
+				redis.set(result.name, result.status);
+				redis.expire(result.name, 1210000);
+				res.cookie('mt_login', crypt_auth.encrypt(result.name), cookie_data);
+				res.redirect('/');
 			}
-			redis.set(result.name, result.status);
-			redis.expire(result.name, 1210000);
-			res.cookie('mt_login', crypt_auth.encrypt(result.name), cookie_data);
-			res.redirect('/');
+			else {
+				render.jade(res, 'eConfirm');
+			}
 		}
 		else {
 			res.redirect('/login#incorrect');
 		}
 	}, function(err) {
 		console.log(err);
-		res.redirect('/login#error');
+		render.server(res);
+		server_error
 	});
 };
 
@@ -95,7 +101,7 @@ function createHub(req, res) {
 		render.jade(res, 'success/hub');
 	}, function(err) {
 		console.log(err);
-		render.jade(res, 'errors/eServer');
+		render.server(res);
 	});
 };
 
@@ -116,10 +122,8 @@ function createArticle(req, res, status) {
 				}
 			};
 			//Получение автора
-			var author_id;
-			var author = crypt_auth.decrypt(req.cookies.mt_login);
-			db.tables.users.findOne({where: {name: author}}).then(function(result) {
-				var author_id = result.id;
+			checking.user(req).then(function(result) {
+				var author_id = result;
 				//Определение статуса статьи
 				var article_status;
 				if(fields.draft) {
@@ -161,7 +165,7 @@ function createArticle(req, res, status) {
 				});
 			}, function(err) {
 				console.log(err);
-				render.jade(res, 'errors/eServer');
+				render.server(res);
 			});
 		});
 	}
