@@ -1,0 +1,7 @@
+mixin article_full(article)
+	h1=data0.title
+	h2 Автор - #{data0.author}
+	p Создано #{data0.updatedAt}
+	p Теги: #{data0.tags}
+	p!=data0.text
+//-mixin article_short

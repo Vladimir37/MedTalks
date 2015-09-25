@@ -5,11 +5,13 @@ var formidable = require('formidable');
 var fs = require('fs');
 var ei = require('easyimage');
 
+var authent = require('./assist/authent');
 var render = require('./render');
 var db = require('./assist/database');
 var config = require('./configs/app_config');
 var checking = require('./assist/checking');
 var mail = require('./assist/mail').send;
+var assist = require('./assist/assist');
 
 //Создание Redis-клиента
 var redis = Redis.createClient();
@@ -53,7 +55,13 @@ function registration(req, res) {
 //Подтверждение регистрации
 function confirm(res, key) {
 	checking.confirm(key).then(function(user_id) {
-		db.tables.users.update({status: 1}, {where: {id: user_id}}).then(function() {
+		//Определение статуса по конфигу
+		var user_status = 2;
+		if(config.restrictions_users) {
+			user_status = 1;
+		}
+		//Запись в базу
+		db.tables.users.update({status: user_status}, {where: {id: user_id}}).then(function() {
 			res.redirect('/confirm#success');
 		}, function(err) {
 			console.log(err);
@@ -71,7 +79,7 @@ function auth(req, res) {
 	var enter_pass = req.body.pass;
 	db.tables.users.findOne({where: {mail: enter_login}}).then(function(result) {
 		if(result && crypt_pass.decrypt(result.pass) == enter_pass) {
-			if(result.status == 0) {
+			if(result.status != 0) {
 				var cookie_data = {};
 				if(req.body.remember) {
 					cookie_data.maxAge = 1210000000
@@ -121,6 +129,7 @@ function createArticle(req, res, status) {
 					valid_files.push(files[key])
 				}
 			};
+
 			//Получение автора
 			checking.user(req).then(function(result) {
 				var author_id = result;
@@ -135,6 +144,8 @@ function createArticle(req, res, status) {
 				else {
 					article_status = 2
 				}
+				//Удаление html разметки
+				fields.text = assist.safety(fields.text);
 				//Создание записи в базе
 				db.tables.articles.create({
 					title: fields.title,
@@ -171,8 +182,55 @@ function createArticle(req, res, status) {
 	}
 };
 
+//Операции с черновой статьёй
+function draftAction(req, res, num, user) {
+	db.tables.articles.findOne({where: {id: num, author: user, status: 0}}).then(function(result) {
+		authent(req).then(function(status) {
+			if(result != null) {
+				var article_status = 2;
+				if(status == 1) {
+					article_status = 1;
+				}
+				switch(req.body.type) {
+					case 1:
+						//Публикация
+						db.tables.articles.update({status: article_status}, {where: {id: num}}).then(function() {
+							render.jade(res, 'success/article');
+						}, function(err) {
+							console.log(err);
+							render.server(res);
+						});
+						break;
+					case 2:
+						//Редактирование
+						break;
+					case 3:
+						//Удаление
+						db.tables.articles.destroy({where: {id: num}}).then(function() {
+							render.jade(res, 'success/delete');
+						}, function(err) {
+							console.log(err);
+							render.server(res);
+						});
+						break;
+					default:
+						//Ошибка
+						render.error(res);
+						break;
+				}
+			}
+			else {
+				render.error(res);
+			}
+		});
+	}, function(err) {
+		render.server(res);
+	});
+};
+
 exports.registration = registration;
 exports.confirm = confirm;
 exports.auth = auth;
 exports.hub = createHub;
 exports.create_article = createArticle;
+exports.draft = draftAction;

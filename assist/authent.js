@@ -13,7 +13,7 @@ var crypt_auth = new Crypt({
 });
 
 //Проверка авторизации и статус
-function authentication(req, res) {
+function authentication(req) {
 	return new Promise(function(resolve, reject) {
 		if(req.cookies.mt_login) {
 			var cookie_key = crypt_auth.decrypt(req.cookies.mt_login);

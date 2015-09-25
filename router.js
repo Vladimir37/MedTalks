@@ -6,6 +6,7 @@ var render = require('./render');
 var pages = require('./assist/pages');
 var control = require('./control');
 var authent = require('./assist/authent');
+var checking = require('./assist/checking');
 
 var app = express();
 app.use(parser());
@@ -33,10 +34,18 @@ app.get('/login', function(req, res) {
 app.get('/article/:name', function(req, res) {
 	pages.article(req, res);
 });
-//Просмотр черновика
+//Просмотр всего черновика
 app.get('/draft', function(req, res) {
 	authent(req).then(function(status) {
 		pages.draft(req, res);
+	}, function(err) {
+		render.error(res);
+	});
+});
+//Просмотр статьи в черновике
+app.get('/draft/:name', function(req, res) {
+	checking.user(req).then(function(user_id) {
+		pages.draft_article(req, res, user_id);
 	}, function(err) {
 		render.error(res);
 	});
@@ -91,6 +100,14 @@ app.post('/create_hub', function(req, res) {
 app.post('/create_article', function(req, res) {
 	authent(req).then(function(status) {
 		control.create_article(req, res, status);
+	}, function(err) {
+		render.error(res);
+	});
+});
+//Операции с черновой статьёй
+app.post('/draft/:name', function(req, res) {
+	checking.user(req).then(function(user_id) {
+		control.draft(req, res, req.params.name, user_id);
 	}, function(err) {
 		render.error(res);
 	});
