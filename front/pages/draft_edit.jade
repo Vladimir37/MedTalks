@@ -1,0 +1,18 @@
+extends basis/layout
+
+block content
+	form(method="post")
+		input(type="hidden" name="type" value="4")
+		input(type="text" name="title" value=data1.title)
+		br
+		textarea(name="text")=data1.text
+		br
+		input(type="text" name="tags" value=data1.tags)
+		br
+		select(name="hub")
+			- for(var i = 0; i < data0.length; i++)
+				- if(data0[i].id == data1.hub)
+					option(value=data0[i].id selected)=data0[i].name
+				- else 
+					option(value=data0[i].id)=data0[i].name
+		br

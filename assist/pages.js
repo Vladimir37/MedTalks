@@ -25,10 +25,15 @@ function article(req, res) {
 	})
 }
 
-//Создание статьи (запрос хабов)
-function create_article(res) {
+//Создание и изменение статьи статьи (запрос хабов)
+function create_article(res, article) {
 	db.tables.hubs.findAll().then(function(result) {
-		render.jade(res, 'create_article', result);
+		if(article) {
+			render.jade(res, 'draft_edit', result, article);
+		}
+		else {
+			render.jade(res, 'create_article', result);
+		}
 	}, function(err) {
 		serverError(err);
 	})

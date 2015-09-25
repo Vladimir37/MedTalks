@@ -7,6 +7,7 @@ var ei = require('easyimage');
 
 var authent = require('./assist/authent');
 var render = require('./render');
+var pages = require('./assist/pages');
 var db = require('./assist/database');
 var config = require('./configs/app_config');
 var checking = require('./assist/checking');
@@ -192,7 +193,7 @@ function draftAction(req, res, num, user) {
 					article_status = 1;
 				}
 				switch(req.body.type) {
-					case 1:
+					case '1':
 						//Публикация
 						db.tables.articles.update({status: article_status}, {where: {id: num}}).then(function() {
 							render.jade(res, 'success/article');
@@ -201,10 +202,11 @@ function draftAction(req, res, num, user) {
 							render.server(res);
 						});
 						break;
-					case 2:
+					case '2':
 						//Редактирование
+						pages.create_article(res, result);
 						break;
-					case 3:
+					case '3':
 						//Удаление
 						db.tables.articles.destroy({where: {id: num}}).then(function() {
 							render.jade(res, 'success/delete');
