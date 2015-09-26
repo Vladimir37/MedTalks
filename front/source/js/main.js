@@ -1,6 +1,6 @@
 $(document).ready(function() {
 	//Номер изображения
-	var imgs = 0;
+	var imgs = 0 || $('#max_img').val();
 	//Добавление загруженного изображения в текст
 	$('.files').on('change', '.image_load', function() {
 		if($(this).data('load') == true) {

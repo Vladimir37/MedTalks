@@ -146,7 +146,7 @@ function createArticle(req, res, status) {
 					article_status = 2
 				}
 				//Удаление html разметки
-				fields.text = assist.safety(fields.text);
+				fields = assist.safety(fields);
 				//Создание записи в базе
 				db.tables.articles.create({
 					title: fields.title,
@@ -154,7 +154,8 @@ function createArticle(req, res, status) {
 					tags: fields.tags,
 					hub: fields.hub,
 					author: author_id,
-					status: article_status
+					status: article_status,
+					images: valid_files.length
 				}).then(function(result) {
 					render.jade(res, 'success/article');
 					var article_id = result.id;
@@ -163,14 +164,12 @@ function createArticle(req, res, status) {
 							console.log(err);
 						}
 						else {
+							//Создание валидных изображений
 							for(var i = 0; i < valid_files.length; i++) {
-								//Создание валидных изображений
-								for(var i = 0; i < valid_files.length; i++) {
-									ei.convert({
-										src: valid_files[i].path,
-										dst: './front/source/illustrations/' + article_id + '/img' + i + '.png'
-									});
-								}
+								ei.convert({
+									src: valid_files[i].path,
+									dst: './front/source/illustrations/' + article_id + '/img' + i + '.png'
+								});
 							}
 						}
 					})
@@ -215,6 +214,10 @@ function draftAction(req, res, num, user) {
 							render.server(res);
 						});
 						break;
+					case '4':
+						//Сохранение редактирования
+						editingDraft(req, res, num);
+						break;
 					default:
 						//Ошибка
 						render.error(res);
@@ -227,6 +230,55 @@ function draftAction(req, res, num, user) {
 		});
 	}, function(err) {
 		render.server(res);
+	});
+};
+
+//Созранение редактирования
+function editingDraft(req, res, num) {
+	var form = new formidable.IncomingForm({encoding: 'utf-8', uploadDir: 'temp', keepExtensions: true});
+	form.parse(req, function(err, fields, files) {
+		//Обработка изображений
+		var valid_files = [];
+		//Валидация файлов
+		for(key in files) {
+			if(checking.file(files[key])) {
+				valid_files.push(files[key])
+			}
+		};
+		//Удаление html разметки
+		fields = assist.safety(fields);
+		//Изменение записи в базе
+		db.tables.articles.update({
+			title: fields.title,
+			text: fields.text,
+			tags: fields.tags,
+			hub: fields.hub
+		}, {where: {id: num}}).then(function(article) {
+			//Создание валидных изображений
+			var sum_images = valid_files.length + article.images;
+			console.log(sum_images);
+			for(var i = article.images; i < sum_images; i++) {
+				ei.convert({
+					src: valid_files[i].path,
+					dst: './front/source/illustrations/' + num + '/img' + i + '.png'
+				});
+			}
+			//Увеличение счётчика изображений
+			db.tables.articles.findOne({where: {id: num}}).then(function(article) {
+				article.increment('images', {by: valid_files.length}).then(function() {
+					res.redirect('/draft/' + num);
+				}, function(err) {
+					console.log(err);
+					render.server(res);
+				});
+			}, function(err) {
+				console.log(err);
+				render.server(res);
+			});	
+		}, function(err) {
+			console.log(err);
+			render.server(res);
+		});
 	});
 };
 

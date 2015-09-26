@@ -58,6 +58,10 @@ tables.articles = sequelize.define('articles', {
 	rating: {
 		type: Sequelize.INTEGER,
 		defaultValue: 0
+	},
+	images: {
+		type: Sequelize.INTEGER,
+		defaultValue: 0
 	}
 });
 

@@ -60,6 +60,7 @@ function draft_article(req, res, user_id) {
 			render.error(res);
 		}
 		else {
+			result = assist.images(result);
 			render.jade(res, 'draft_article', result);
 		}
 	}, function(err) {

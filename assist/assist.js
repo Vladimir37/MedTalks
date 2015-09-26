@@ -7,10 +7,12 @@ function imagesRender(article) {
 };
 
 //Удаление html-разметки из статей
-function safetyText(text) {
-	var result = text.replace(/\</g, '&#60;');
-	result = result.replace(/\>/g, '&#62;');
-	return result;
+function safetyText(obj) {
+	for(field in obj) {
+		obj[field] = obj[field].replace(/\</g, '&#60;');
+		obj[field] = obj[field].replace(/\>/g, '&#62;');
+	}
+	return obj;
 };
 
 //Получение имени юзера по id

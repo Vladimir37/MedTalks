@@ -3,9 +3,10 @@ extends basis/layout
 block content
 	form(method="post")
 		input(type="hidden" name="type" value="4")
+		input(type="hidden" value=data1.images)#max_img
 		input(type="text" name="title" value=data1.title)
 		br
-		textarea(name="text")=data1.text
+		textarea(name="text" id="article_text")=data1.text
 		br
 		input(type="text" name="tags" value=data1.tags)
 		br
@@ -16,3 +17,12 @@ block content
 				- else 
 					option(value=data0[i].id)=data0[i].name
 		br
+		h3 Загруженные изображения:
+		ul
+			- for(var i = 0; i < data1.images; i++)
+				li
+					img(src="/source/illustrations/" + data1.id + "/img" + i + ".png", alt="illustration" style="width: 100px;")
+		article.files
+			input(type="file" name="f0" class="image_load" data-load="true")
+			br
+		input(type="submit" value="Сохранить изменения")
