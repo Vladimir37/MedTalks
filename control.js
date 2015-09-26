@@ -191,6 +191,7 @@ function draftAction(req, res, num, user) {
 				if(status == 1) {
 					article_status = 1;
 				}
+				console.log(req.body.type);
 				switch(req.body.type) {
 					case '1':
 						//Публикация
@@ -214,13 +215,9 @@ function draftAction(req, res, num, user) {
 							render.server(res);
 						});
 						break;
-					case '4':
+					default:
 						//Сохранение редактирования
 						editingDraft(req, res, num);
-						break;
-					default:
-						//Ошибка
-						render.error(res);
 						break;
 				}
 			}
@@ -235,8 +232,11 @@ function draftAction(req, res, num, user) {
 
 //Созранение редактирования
 function editingDraft(req, res, num) {
+	console.log('НАЧАТО');
 	var form = new formidable.IncomingForm({encoding: 'utf-8', uploadDir: 'temp', keepExtensions: true});
 	form.parse(req, function(err, fields, files) {
+		console.log(fields);
+		console.log(files);
 		//Обработка изображений
 		var valid_files = [];
 		//Валидация файлов
@@ -245,6 +245,8 @@ function editingDraft(req, res, num) {
 				valid_files.push(files[key])
 			}
 		};
+		//---------
+		console.log(valid_files);
 		//Удаление html разметки
 		fields = assist.safety(fields);
 		//Изменение записи в базе
@@ -253,18 +255,20 @@ function editingDraft(req, res, num) {
 			text: fields.text,
 			tags: fields.tags,
 			hub: fields.hub
-		}, {where: {id: num}}).then(function(article) {
-			//Создание валидных изображений
-			var sum_images = valid_files.length + article.images;
-			console.log(sum_images);
-			for(var i = article.images; i < sum_images; i++) {
-				ei.convert({
-					src: valid_files[i].path,
-					dst: './front/source/illustrations/' + num + '/img' + i + '.png'
-				});
-			}
-			//Увеличение счётчика изображений
+		}, {where: {id: num}}).then(function() {
 			db.tables.articles.findOne({where: {id: num}}).then(function(article) {
+			//Создание валидных изображений
+				var sum_images = valid_files.length + article.images;
+				console.log('ОТ ' + article.images + 'ДО ' + sum_images);
+				var j = 0;
+				for(var i = article.images; i < sum_images; i++) {
+					ei.convert({
+						src: valid_files[j].path,
+						dst: './front/source/illustrations/' + num + '/img' + i + '.png'
+					});
+					j++;
+				}
+				//Увеличение счётчика изображений
 				article.increment('images', {by: valid_files.length}).then(function() {
 					res.redirect('/draft/' + num);
 				}, function(err) {
