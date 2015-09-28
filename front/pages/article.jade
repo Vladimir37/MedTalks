@@ -2,3 +2,12 @@ extends basis/layout
 
 block content
 	mixin article_full(data0)
+	- each item, i in data1
+		p=item.text
+	article.comment_create
+		form(action="/comment/" + data0.id method="post")
+			input(type="hidden" name="answer" value=null)
+			br
+			textarea(name="text")
+			br
+			input(type="submit" value="Отправить")

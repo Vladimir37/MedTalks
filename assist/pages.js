@@ -5,8 +5,8 @@ var assist = require('./assist');
 
 //Рендер публичной статьи
 function article(req, res) {
-	var name = req.params.name;
-	db.tables.articles.findOne({where: {id: name, status: 2}}).then(function(article) {
+	var num = req.params.name;
+	db.tables.articles.findOne({where: {id: num, status: 2}}).then(function(article) {
 		if(article == null) {
 			render.error(res);
 		}
@@ -15,7 +15,12 @@ function article(req, res) {
 			article = assist.images(article);
 			//Замена номера автора на имя
 			assist.user(article).then(function(result) {
-				render.jade(res, 'article', result);
+				//Поиск комментариев к статье
+				db.tables.comments.findAll({where: {article: num}}).then(function(comments) {
+					render.jade(res, 'article', result, comments);
+				}, function(err) {
+					serverError(err);
+				});
 			}, function(err) {
 				serverError(err);
 			});

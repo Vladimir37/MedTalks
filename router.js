@@ -107,7 +107,15 @@ app.post('/create_article', function(req, res) {
 //Операции с черновой статьёй
 app.post('/draft/:name', function(req, res) {
 	checking.user(req).then(function(user_id) {
-		control.draft(req, res, req.params.name, user_id);
+		control.draft(req, res, user_id);
+	}, function(err) {
+		render.error(res);
+	});
+});
+//Отправка комментария
+app.post('/comment/:name', function(req, res) {
+	checking.user(req).then(function(user_id) {
+		control.comment(req, res, user_id);
 	}, function(err) {
 		render.error(res);
 	});

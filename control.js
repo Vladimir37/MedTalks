@@ -183,7 +183,8 @@ function createArticle(req, res, status) {
 };
 
 //Операции с черновой статьёй
-function draftAction(req, res, num, user) {
+function draftAction(req, res, user) {
+	var num = req.params.name;
 	db.tables.articles.findOne({where: {id: num, author: user, status: 0}}).then(function(result) {
 		authent(req).then(function(status) {
 			if(result != null) {
@@ -230,13 +231,10 @@ function draftAction(req, res, num, user) {
 	});
 };
 
-//Созранение редактирования
+//Сохранение редактирования
 function editingDraft(req, res, num) {
-	console.log('НАЧАТО');
 	var form = new formidable.IncomingForm({encoding: 'utf-8', uploadDir: 'temp', keepExtensions: true});
 	form.parse(req, function(err, fields, files) {
-		console.log(fields);
-		console.log(files);
 		//Обработка изображений
 		var valid_files = [];
 		//Валидация файлов
@@ -245,8 +243,6 @@ function editingDraft(req, res, num) {
 				valid_files.push(files[key])
 			}
 		};
-		//---------
-		console.log(valid_files);
 		//Удаление html разметки
 		fields = assist.safety(fields);
 		//Изменение записи в базе
@@ -259,7 +255,6 @@ function editingDraft(req, res, num) {
 			db.tables.articles.findOne({where: {id: num}}).then(function(article) {
 			//Создание валидных изображений
 				var sum_images = valid_files.length + article.images;
-				console.log('ОТ ' + article.images + 'ДО ' + sum_images);
 				var j = 0;
 				for(var i = article.images; i < sum_images; i++) {
 					ei.convert({
@@ -286,9 +281,31 @@ function editingDraft(req, res, num) {
 	});
 };
 
+//Создание комментария
+function addComment(req, res, user_id) {
+	var num = req.params.name;
+	if(req.body.text) {
+		db.tables.comments.create({
+			text: req.body.text,
+			article: num,
+			author: user_id,
+			answer: req.body.answer
+		}).then(function() {
+			render.jade(res, 'success/comment');
+		}, function(err) {
+			console.log(err);
+			render.server(res);
+		})
+	}
+	else {
+		render.error(res);
+	}
+};
+
 exports.registration = registration;
 exports.confirm = confirm;
 exports.auth = auth;
 exports.hub = createHub;
 exports.create_article = createArticle;
 exports.draft = draftAction;
+exports.comment = addComment;
