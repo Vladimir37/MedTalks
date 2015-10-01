@@ -91,7 +91,7 @@ function auth(req, res) {
 				res.redirect('/');
 			}
 			else {
-				render.jade(res, 'eConfirm');
+				render.jade(res, 'errors/eConfirm');
 			}
 		}
 		else {

@@ -16,17 +16,18 @@ function article(req, res) {
 			//Замена номера автора на имя
 			assist.user(article).then(function(result) {
 				//Поиск комментариев к статье
-				db.tables.comments.findAll({where: {article: num}}).then(function(comments) {
+				db.tables.comments.findAll({where: {article: num}, include: [{model: db.tables.users}]}).then(function(comments) {
+					console.log(comments);
 					render.jade(res, 'article', result, comments);
 				}, function(err) {
-					serverError(err);
+					serverError(err, res);
 				});
 			}, function(err) {
-				serverError(err);
+				serverError(err, res);
 			});
 		}
 	}, function(err) {
-		serverError(err);
+		serverError(err, res);
 	})
 }
 
@@ -40,7 +41,7 @@ function create_article(res, article) {
 			render.jade(res, 'create_article', result);
 		}
 	}, function(err) {
-		serverError(err);
+		serverError(err, res);
 	})
 };
 
@@ -51,10 +52,10 @@ function draft_render(req, res) {
 			//полученные статьи в черновике
 			render.jade(res, 'draft', result);
 		}, function(err) {
-			serverError(err);
+			serverError(err, res);
 		})
 	}, function(err) {
-		serverError(err);
+		serverError(err, res);
 	});
 };
 
@@ -69,12 +70,12 @@ function draft_article(req, res, user_id) {
 			render.jade(res, 'draft_article', result);
 		}
 	}, function(err) {
-		serverError(err);
+		serverError(err, res);
 	})
 };
 
 //Рендер ошибки и сообщение в консоль
-function serverError(err) {
+function serverError(err, res) {
 	console.log(err);
 	render.server(res);
 };

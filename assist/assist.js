@@ -33,6 +33,15 @@ function getUser(article) {
 	});
 };
 
+//Замена всех id юзеров
+function getAllUsers(arr) {
+	return new Promise(function(resolve, reject) {
+		arr.forEach(function(item) {
+			//
+		});
+	});
+};
+
 exports.images = imagesRender;
 exports.safety = safetyText;
 exports.user = getUser;

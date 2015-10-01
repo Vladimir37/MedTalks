@@ -73,7 +73,6 @@ tables.comments = sequelize.define('comments', {
 	},
 	text: Sequelize.TEXT,
 	article: Sequelize.INTEGER,
-	author: Sequelize.INTEGER,
 	answer: Sequelize.INTEGER,
 	rating: {
 		type: Sequelize.INTEGER,
@@ -89,6 +88,9 @@ tables.hubs = sequelize.define('hubs', {
 	},
 	name: Sequelize.TEXT
 });
+
+//Ассоциации
+tables.comments.belongsTo(tables.users, {foreignKey: 'author', targetKey: tables.comments.author});
 
 //Синхронизация и создание всех таблиц
 for(table in tables) {
