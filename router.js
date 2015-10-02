@@ -42,6 +42,10 @@ app.get('/draft', function(req, res) {
 		render.error(res);
 	});
 });
+//Просмотр последнего в хабе
+app.get('/hub/:name', function(req, res) {
+	pages.list(req, res, {type: 1, page: 0});
+})
 //Просмотр статьи в черновике
 app.get('/draft/:name', function(req, res) {
 	checking.user(req).then(function(user_id) {

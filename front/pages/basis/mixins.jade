@@ -1,6 +1,6 @@
 mixin article_full(article)
 	h1=data0.title
-	h2 Автор - #{data0.author}
+	h2 Автор - #{data0.user.name}
 	h3 Хаб - #{data0.hub.name}
 	p Создано #{data0.updatedAt}
 	p Теги: #{data0.tags}

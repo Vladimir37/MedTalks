@@ -106,12 +106,26 @@ function auth(req, res) {
 
 //Создание хаба
 function createHub(req, res) {
-	db.tables.hubs.create({name: req.body.name}).then(function() {
-		render.jade(res, 'success/hub');
+	db.tables.hubs.find({where: {addr: req.body.addr}}).then(function(result) {
+		console.log(result);
+		if(result == null) {
+			db.tables.hubs.create({
+				name: req.body.name,
+				addr: req.body.addr
+			}).then(function() {
+				render.jade(res, 'success/hub');
+			}, function(err) {
+				console.log(err);
+				render.server(res);
+			});
+		}
+		else {
+			render.jade(res, 'errors/eHub');
+		}
 	}, function(err) {
 		console.log(err);
 		render.server(res);
-	});
+	})
 };
 
 //Создание статьи

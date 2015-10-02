@@ -6,7 +6,10 @@ var assist = require('./assist');
 //Рендер публичной статьи
 function article(req, res) {
 	var num = req.params.name;
-	db.tables.articles.findOne({where: {id: num, status: 2}, include: [{model: db.tables.hubs}]}).then(function(article) {
+	db.tables.articles.findOne({
+		where: {id: num, status: 2}, 
+		include: [{model: db.tables.hubs}, {model: db.tables.users}]
+	}).then(function(article) {
 		if(article == null) {
 			render.error(res);
 		}
@@ -14,14 +17,12 @@ function article(req, res) {
 			console.log(article);
 			//Рендер изображений
 			article = assist.images(article);
-			//Замена номера автора на имя
-			assist.user(article).then(function(result) {
-				//Поиск комментариев к статье
-				db.tables.comments.findAll({where: {article: num}, include: [{model: db.tables.users}]}).then(function(comments) {
-					render.jade(res, 'article', result, comments);
-				}, function(err) {
-					serverError(err, res);
-				});
+			//Поиск комментариев к статье
+			db.tables.comments.findAll({
+				where: {article: num}, 
+				include: [{model: db.tables.users}]
+			}).then(function(comments) {
+				render.jade(res, 'article', article, comments);
 			}, function(err) {
 				serverError(err, res);
 			});
@@ -61,7 +62,12 @@ function draft_render(req, res) {
 
 //Рендер черновой статьи
 function draft_article(req, res, user_id) {
-	db.tables.articles.findOne({where: {id: req.params.name, author: user_id, status: 0}}).then(function(result) {
+	db.tables.articles.findOne({where: {
+		id: req.params.name, 
+		author: user_id, 
+		status: 0
+	}
+	}).then(function(result) {
 		if(result == null) {
 			render.error(res);
 		}
@@ -74,6 +80,36 @@ function draft_article(req, res, user_id) {
 	})
 };
 
+//Рендер списка статей
+function list(req, res, params) {
+	var hub_name = req.params.name;
+	params.page *= 10;
+	//Статьи хаба
+	if(params.type == 1) {
+		db.tables.hubs.find({where: {addr: hub_name}}).then(function(hub) {
+			if(hub) {
+				db.tables.articles.findAll({
+					where: {hubId: hub.id, status: 2},
+					offset: params.page,
+					limit: 10,
+					order: [['updatedAt', 'DESC']],
+					include: [{model: db.tables.hubs}, {model: db.tables.users}]
+				}).then(function(articles) {
+					console.log(articles.length);
+					res.end('WIN');
+				}, function(err) {
+					serverError(err, res);
+				})
+			}
+			else {
+				render.error(res);
+			}
+		}, function(err) {
+			serverError(err, res);
+		})
+	}
+};
+
 //Рендер ошибки и сообщение в консоль
 function serverError(err, res) {
 	console.log(err);
@@ -84,3 +120,4 @@ exports.create_article = create_article;
 exports.draft = draft_render;
 exports.article = article;
 exports.draft_article = draft_article;
+exports.list = list;

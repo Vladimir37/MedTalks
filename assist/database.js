@@ -85,12 +85,15 @@ tables.hubs = sequelize.define('hubs', {
 		primaryKey: true,
 		autoIncrement: true
 	},
-	name: Sequelize.TEXT
+	name: Sequelize.TEXT,
+	addr: Sequelize.TEXT
 });
 
 //Ассоциации
 //Авторы коментов
 tables.comments.belongsTo(tables.users, {foreignKey: 'author'});
+//Авторы статей
+tables.articles.belongsTo(tables.users, {foreignKey: 'author'});
 //Хабы статей
 tables.articles.belongsTo(tables.hubs, {foreignKey: 'hubId'});
 
