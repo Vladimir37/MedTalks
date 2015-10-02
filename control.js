@@ -152,7 +152,7 @@ function createArticle(req, res, status) {
 					title: fields.title,
 					text: fields.text,
 					tags: fields.tags,
-					hub: fields.hub,
+					hubId: fields.hub,
 					author: author_id,
 					status: article_status,
 					images: valid_files.length

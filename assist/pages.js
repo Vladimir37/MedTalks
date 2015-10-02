@@ -6,18 +6,18 @@ var assist = require('./assist');
 //Рендер публичной статьи
 function article(req, res) {
 	var num = req.params.name;
-	db.tables.articles.findOne({where: {id: num, status: 2}}).then(function(article) {
+	db.tables.articles.findOne({where: {id: num, status: 2}, include: [{model: db.tables.hubs}]}).then(function(article) {
 		if(article == null) {
 			render.error(res);
 		}
 		else {
+			console.log(article);
 			//Рендер изображений
 			article = assist.images(article);
 			//Замена номера автора на имя
 			assist.user(article).then(function(result) {
 				//Поиск комментариев к статье
 				db.tables.comments.findAll({where: {article: num}, include: [{model: db.tables.users}]}).then(function(comments) {
-					console.log(comments);
 					render.jade(res, 'article', result, comments);
 				}, function(err) {
 					serverError(err, res);

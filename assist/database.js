@@ -52,7 +52,6 @@ tables.articles = sequelize.define('articles', {
 	title: Sequelize.TEXT,
 	text: Sequelize.TEXT,
 	tags: Sequelize.TEXT,
-	hub: Sequelize.INTEGER,
 	author: Sequelize.INTEGER,
 	status: Sequelize.INTEGER,
 	rating: {
@@ -90,7 +89,10 @@ tables.hubs = sequelize.define('hubs', {
 });
 
 //Ассоциации
-tables.comments.belongsTo(tables.users, {foreignKey: 'author', targetKey: tables.comments.author});
+//Авторы коментов
+tables.comments.belongsTo(tables.users, {foreignKey: 'author'});
+//Хабы статей
+tables.articles.belongsTo(tables.hubs, {foreignKey: 'hubId'});
 
 //Синхронизация и создание всех таблиц
 for(table in tables) {
