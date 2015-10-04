@@ -6,6 +6,14 @@ function imagesRender(article) {
 	return article;
 };
 
+//Рендер картинок в выборке статей
+function imagesRenderArray(arr) {
+	arr.forEach(function(item) {
+		item = imagesRender(item);
+	});
+	return arr;
+};
+
 //Удаление html-разметки из статей
 function safetyText(obj) {
 	for(field in obj) {
@@ -33,15 +41,7 @@ function getUser(article) {
 	});
 };
 
-//Замена всех id юзеров
-function getAllUsers(arr) {
-	return new Promise(function(resolve, reject) {
-		arr.forEach(function(item) {
-			//
-		});
-	});
-};
-
 exports.images = imagesRender;
+exports.imagesArr = imagesRenderArray;
 exports.safety = safetyText;
 exports.user = getUser;

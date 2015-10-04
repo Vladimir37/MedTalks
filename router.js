@@ -45,7 +45,19 @@ app.get('/draft', function(req, res) {
 //Просмотр последнего в хабе
 app.get('/hub/:name', function(req, res) {
 	pages.list(req, res, {type: 1, page: 0});
-})
+});
+app.get('/hub/:name/:num', function(req, res) {
+	var page_num = req.params.num;
+	pages.list(req, res, {type: 1, page: page_num});
+});
+//Просмотр статей за авторством
+app.get('/author/:name', function(req, res) {
+	pages.list(req, res, {type: 2, page: 0});
+});
+app.get('/author/:name/:num', function(req, res) {
+	var page_num = req.params.num;
+	pages.list(req, res, {type: 2, page: page_num});
+});
 //Просмотр статьи в черновике
 app.get('/draft/:name', function(req, res) {
 	checking.user(req).then(function(user_id) {
