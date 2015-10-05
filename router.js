@@ -58,6 +58,14 @@ app.get('/author/:name/:num', function(req, res) {
 	var page_num = req.params.num;
 	pages.list(req, res, {type: 2, page: page_num});
 });
+//Просмотр статей по тегу
+app.get('/tag/:name', function(req, res) {
+	pages.list(req, res, {type: 3, page: 0});
+});
+app.get('/tag/:name/:num', function(req, res) {
+	var page_num = req.params.num;
+	pages.list(req, res, {type: 3, page: page_num});
+});
 //Просмотр статьи в черновике
 app.get('/draft/:name', function(req, res) {
 	checking.user(req).then(function(user_id) {

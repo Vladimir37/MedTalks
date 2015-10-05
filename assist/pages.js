@@ -84,7 +84,7 @@ function draft_article(req, res, user_id) {
 function list(req, res, params) {
 	var target_name = req.params.name;
 	var start_article = params.page * 10;
-	//Статьи хаба
+	//По хабу
 	if(params.type == 1) {
 		db.tables.hubs.find({where: {addr: target_name}}).then(function(hub) {
 			if(hub) {
@@ -117,6 +117,7 @@ function list(req, res, params) {
 			serverError(err, res);
 		})
 	}
+	//По автору
 	else if(params.type == 2) {
 		db.tables.users.find({where: {name: target_name}}).then(function(user) {
 			if(user) {
@@ -141,6 +142,34 @@ function list(req, res, params) {
 				}, function(err) {
 					serverError(err, res);
 				})
+			}
+			else {
+				render.error(res);
+			}
+		}, function(err) {
+			serverError(err, res);
+		})
+	}
+	//По тегу
+	else if(params.type == 3) {
+		db.tables.articles.findAndCountAll({
+			where: {
+				status: 2, tags: {
+					$like: '%' + target_name + '%'
+				}
+			},
+			offset: start_article,
+			limit: 10,
+			order: [['updatedAt', 'DESC']],
+			include: [{model: db.tables.hubs}, {model: db.tables.users}]
+		}).then(function(articles) {
+			if(articles.rows) {
+				var page_data = {
+					current: params.page,
+					total: Math.floor(articles.count / 10)
+				};
+				articles.rows = assist.imagesArr(articles.rows);
+				render.jade(res, 'tag_list', articles.rows, target_name, page_data);
 			}
 			else {
 				render.error(res);
