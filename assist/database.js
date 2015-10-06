@@ -32,6 +32,10 @@ tables.users = sequelize.define('users', {
 		type: Sequelize.INTEGER,
 		defaultValue: 0
 	},
+	avatar: {
+		type: Sequelize.INTEGER,
+		defaultValue: 0
+	},
 	rating: {
 		type: Sequelize.INTEGER,
 		defaultValue: 0
@@ -87,6 +91,22 @@ tables.hubs = sequelize.define('hubs', {
 	},
 	name: Sequelize.TEXT,
 	addr: Sequelize.TEXT
+});
+
+tables.profiles = sequelize.define('profiles', {
+	id: {
+		type: Sequelize.INTEGER,
+		primaryKey: true,
+		autoIncrement: true
+	},
+	public_name: Sequelize.TEXT,
+	place: Sequelize.TEXT,
+	contact_type: Sequelize.INTEGER,
+	contact_address: Sequelize.TEXT,
+	description: Sequelize.TEXT,
+	sub_hubs: Sequelize.TEXT,
+	sub_users: Sequelize.TEXT,
+	sub_tags: Sequelize.TEXT
 });
 
 //Ассоциации

@@ -1,0 +1,41 @@
+extends basis/layout
+
+block content
+	h1 Профиль
+	- var avatar;
+	- if(data0.avatar)
+		- avatar =  data0.id
+	- else 
+		- avatar = 'default'
+	img(src="/source/avatars/" + avatar + ".png", alt="avatar")
+	h2 Загрузить аватар
+	form(method="post" enctype="multipart/form-data")
+		input(type="hidden" name="type" value="1")
+		input(type="file" name="avatar" required)
+		input(type="submit" value="Загрузить")
+	p Ваш ник: #{data0.name}
+	form(method="post" enctype="multipart/form-data")
+		input(type="hidden" name="type" value="2")
+		p Вы о себе: 
+			textarea(name="desc" disabled) #{data1.description || 'НЕ УКАЗАНО'}
+		p Ваша почта: #{data0.mail}
+		p Ваш рейтинг: #{data0.rating}
+		p Ваш статус: #{data0.status}
+		p Ваше место жительства: 
+			input(type="text" name="place" value=data1.place || 'НЕ УКАЗАНО' disabled)
+		p Способ связи с вами:
+			select(name="contact_type" disabled)
+				option(value="0") НЕ УКАЗАНО
+				option(value="1") Skype
+				option(value="2") e-mail
+				option(value="3") Телефон
+			input(type="text" name="address" value=data1.contact_address || 'НЕ УКАЗАНО' disabled)
+		//Тут кнопка РЕДАКТИРОВАТЬ которая отключает disabled и добавляет сабмит
+		//А тут изначально скрытый сабмит
+		input(type="submit" value="Сохранить")
+	p Вы подписаны на:
+	ul
+		li Разделы: #{data1.sub_hubs}
+		li Пользователей: #{data1.sub_users}
+		li Теги: #{data1.sub_tags}
+	p Вы с нами с #{data0.createdAt}

@@ -14,7 +14,6 @@ function article(req, res) {
 			render.error(res);
 		}
 		else {
-			console.log(article);
 			//Рендер изображений
 			article = assist.images(article);
 			//Поиск комментариев к статье
@@ -180,6 +179,19 @@ function list(req, res, params) {
 	}
 };
 
+//Просмотр своего профиля
+function profile(res, user_id) {
+	db.tables.users.findOne({where: {id: user_id}}).then(function(user_data) {
+		db.tables.profiles.findOne({where: {id: user_id}}).then(function(profile_data) {
+			render.jade(res, 'profile', user_data, profile_data);
+		}, function(err) {
+			serverError(err, res);
+		});
+	}, function(err) {
+		serverError(err, res);
+	});
+};
+
 //Рендер ошибки и сообщение в консоль
 function serverError(err, res) {
 	console.log(err);
@@ -191,3 +203,4 @@ exports.draft = draft_render;
 exports.article = article;
 exports.draft_article = draft_article;
 exports.list = list;
+exports.profile = profile;

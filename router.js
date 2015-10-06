@@ -66,6 +66,18 @@ app.get('/tag/:name/:num', function(req, res) {
 	var page_num = req.params.num;
 	pages.list(req, res, {type: 3, page: page_num});
 });
+//Профиль юзера
+app.get('/user/:name', function(req, res) {
+	//
+});
+//Свой профиль
+app.get('/profile', function(req, res) {
+	checking.user(req).then(function(user_id) {
+		pages.profile(res, user_id);
+	}, function(err) {
+		render.error(res);
+	});
+});
 //Просмотр статьи в черновике
 app.get('/draft/:name', function(req, res) {
 	checking.user(req).then(function(user_id) {
@@ -140,6 +152,14 @@ app.post('/draft/:name', function(req, res) {
 app.post('/comment/:name', function(req, res) {
 	checking.user(req).then(function(user_id) {
 		control.comment(req, res, user_id);
+	}, function(err) {
+		render.error(res);
+	});
+});
+//Редактирвоание профиля
+app.post('/profile', function(req, res) {
+	checking.user(req).then(function(user_id) {
+		control.profile(req, res, user_id);
 	}, function(err) {
 		render.error(res);
 	});

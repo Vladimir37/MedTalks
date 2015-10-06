@@ -39,8 +39,18 @@ function registration(req, res) {
 		}).then(function(result) {
 			//Отправка письма с подтверждением
 			var key_mail = result.key + '_' + result.id;
+			//Отправка письма. ПЕРЕДЕЛАТЬ
 			mail(req.body.mail, 'Регистрация на MedTalks', 'Вы зарегистрированы. Перейдите по этой ссылке для подтверждения регистрации: <br><a href="http://localhost:3000/confirm/'+ key_mail +'">http://localhost:3000/confirm/'+ key_mail +'<a/>');
-			res.redirect('/registration#success');
+			//Создание профиля
+			db.tables.profiles.create({
+				id: result.id
+			}).then(function() {
+				render.jade(res, 'registration_success');
+			}, function(err) {
+				//Ошибка базы
+				console.log(err);
+				render.server(res);
+			})
 		}, function(err) {
 			//Ошибка базы
 			console.log(err);
@@ -316,6 +326,52 @@ function addComment(req, res, user_id) {
 	}
 };
 
+//Редактирование профиля
+function profile(req, res, user_id) {
+	var form = new formidable.IncomingForm({encoding: 'utf-8', uploadDir: 'temp', keepExtensions: true});
+	form.parse(req, function(err, fields, files) {
+		//Загрузка аватара
+		if(fields.type == 1) {
+			if(checking.file(files.avatar)) {
+				ei.convert({
+					src: files.avatar.path,
+					dst: './front/source/avatars/' + user_id + '.png'
+				});
+				db.tables.users.update({avatar: 1}, {where: {id: user_id}}).then(function() {
+					res.redirect('/profile');
+				}, function(err) {
+					console.log(err);
+					render.server(res);
+				});
+			}
+			else {
+				render.jade(res, 'errors/eImage');
+			}
+		}
+		//Редактирование текстовой информации
+		else if(fields.type == 2) {
+			db.tables.profiles.update({
+				description: fields.desc,
+				place: fields.place,
+				contact_type: fields.contact_type,
+				contact_address: fields.contact_address
+			}, {where: {
+				id: user_id
+			}}).then(function() {
+				res.redirect('/profile');
+			}, function(err) {
+				console.log(err);
+				render.server(res);
+			});
+		}
+		//Ошибка - редактирование без типа
+		else {
+			console.log('Ошибка - редактирование без типа');
+			render.error(res);
+		}
+	});
+};
+
 exports.registration = registration;
 exports.confirm = confirm;
 exports.auth = auth;
@@ -323,3 +379,4 @@ exports.hub = createHub;
 exports.create_article = createArticle;
 exports.draft = draftAction;
 exports.comment = addComment;
+exports.profile = profile;
