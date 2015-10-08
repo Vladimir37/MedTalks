@@ -45,27 +45,13 @@ function create_article(res, article) {
 	})
 };
 
-//Рендер черновика
-function draft_render(req, res) {
-	checking.user(req).then(function(user_id) {
-		db.tables.articles.findAll({where: {author: user_id, status: 0}}).then(function(result) {
-			//полученные статьи в черновике
-			render.jade(res, 'draft', result);
-		}, function(err) {
-			serverError(err, res);
-		})
-	}, function(err) {
-		serverError(err, res);
-	});
-};
-
 //Рендер черновой статьи
-function draft_article(req, res, user_id) {
+function draft_article(req, res) {
 	db.tables.articles.findOne({where: {
 		id: req.params.name, 
-		author: user_id, 
+		author: req.user.id, 
 		status: 0
-	}
+	}, include: [{model: db.tables.users}, {model: db.tables.hubs}]
 	}).then(function(result) {
 		if(result == null) {
 			render.error(res);
@@ -177,6 +163,18 @@ function list(req, res, params) {
 			serverError(err, res);
 		})
 	}
+	//Черновик
+	else if(params.type == 4) {
+		db.tables.articles.findAll({where: {
+			author: req.user.id, 
+			status: 0
+		}}).then(function(result) {
+			//Полученные статьи в черновике
+			render.jade(res, 'draft', result);
+		}, function(err) {
+			serverError(err, res);
+		});
+	}
 };
 
 //Просмотр своего профиля
@@ -199,7 +197,6 @@ function serverError(err, res) {
 };
 
 exports.create_article = create_article;
-exports.draft = draft_render;
 exports.article = article;
 exports.draft_article = draft_article;
 exports.list = list;

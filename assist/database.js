@@ -99,7 +99,6 @@ tables.profiles = sequelize.define('profiles', {
 		primaryKey: true,
 		autoIncrement: true
 	},
-	public_name: Sequelize.TEXT,
 	place: Sequelize.TEXT,
 	contact_type: Sequelize.INTEGER,
 	contact_address: Sequelize.TEXT,

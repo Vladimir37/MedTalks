@@ -139,7 +139,8 @@ function createHub(req, res) {
 };
 
 //Создание статьи
-function createArticle(req, res, status) {
+function createArticle(req, res) {
+	var status = req.user.status;
 	if(status == 0) {
 		render.jade(res, 'errors/eConfirm');
 	}
@@ -306,13 +307,13 @@ function editingDraft(req, res, num) {
 };
 
 //Создание комментария
-function addComment(req, res, user_id) {
+function addComment(req, res) {
 	var num = req.params.name;
 	if(req.body.text) {
 		db.tables.comments.create({
 			text: req.body.text,
 			article: num,
-			author: user_id,
+			author: req.user.id,
 			answer: req.body.answer
 		}).then(function() {
 			render.jade(res, 'success/comment');
@@ -327,7 +328,8 @@ function addComment(req, res, user_id) {
 };
 
 //Редактирование профиля
-function profile(req, res, user_id) {
+function profile(req, res) {
+	var user_id = req.user.id;
 	var form = new formidable.IncomingForm({encoding: 'utf-8', uploadDir: 'temp', keepExtensions: true});
 	form.parse(req, function(err, fields, files) {
 		//Загрузка аватара

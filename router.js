@@ -12,15 +12,22 @@ var app = express();
 app.use(parser());
 app.use(cookie());
 
+//Проверка авторизации при загрузке
+app.use(function (req, res, next) {
+	authent(req).then(function (user){
+		req.user = user;
+		next();
+	}, function() {
+		next();
+	});
+});
+
 //GET-запросы
 
 //Главная ---------------------------------------------
 app.get('/', function(req, res) {
-	authent(req).then(function(status) {
-		res.end(status);
-	}, function(err) {
-		res.end('Not autorized');
-	});
+	console.log(req.user);
+	res.end('END');
 });
 //Регистрация
 app.get('/registration', function(req, res) {
@@ -33,14 +40,6 @@ app.get('/login', function(req, res) {
 //Просмотр статьи
 app.get('/article/:name', function(req, res) {
 	pages.article(req, res);
-});
-//Просмотр всего черновика
-app.get('/draft', function(req, res) {
-	authent(req).then(function(status) {
-		pages.draft(req, res);
-	}, function(err) {
-		render.error(res);
-	});
 });
 //Просмотр последнего в хабе
 app.get('/hub/:name', function(req, res) {
@@ -66,47 +65,55 @@ app.get('/tag/:name/:num', function(req, res) {
 	var page_num = req.params.num;
 	pages.list(req, res, {type: 3, page: page_num});
 });
+//Просмотр всего черновика
+app.get('/draft', function(req, res) {
+	if(req.user) {
+		pages.list(req, res, {type: 4, page: 0});
+	}
+	else {
+		render.error(res);
+	}
+});
+//Просмотр статьи в черновике
+app.get('/draft/:name', function(req, res) {
+	if(req.user) {
+		pages.draft_article(req, res);
+	}
+	else {
+		render.error(res);
+	}
+});
 //Профиль юзера
 app.get('/user/:name', function(req, res) {
 	//
 });
 //Свой профиль
 app.get('/profile', function(req, res) {
-	checking.user(req).then(function(user_id) {
-		pages.profile(res, user_id);
-	}, function(err) {
+	if(req.user) {
+		pages.profile(res, req.user.id);
+	}
+	else {
 		render.error(res);
-	});
-});
-//Просмотр статьи в черновике
-app.get('/draft/:name', function(req, res) {
-	checking.user(req).then(function(user_id) {
-		pages.draft_article(req, res, user_id);
-	}, function(err) {
-		render.error(res);
-	});
+	}
 });
 //Создание ----------------------------
 //Создание статьи
 app.get('/create_article', function(req, res) {
-	authent(req).then(function(status) {
+	if(req.user) {
 		pages.create_article(res);
-	}, function(err) {
+	}
+	else {
 		render.error(res);
-	});
+	}
 });
 //Создание хаба
 app.get('/create_hub', function(req, res) {
-	authent(req).then(function(status) {
-		if(status == 4) {
-			render.jade(res, 'create_hub');
-		}
-		else {
-			render.error(res);
-		}
-	}, function(err) {
+	if(req.user && req.user.status == 4) {
+		render.jade(res, 'create_hub');
+	}
+	else {
 		render.error(res);
-	});
+	}
 });
 
 //POST-запросы ---------------------------------------------
@@ -121,48 +128,49 @@ app.post('/login', function(req, res) {
 })
 //Создание хаба
 app.post('/create_hub', function(req, res) {
-	authent(req).then(function(status) {
-		if(status == 4) {
-			control.hub(req, res);
-		}
-		else {
-			render.error(res);
-		}
-	}, function(err) {
+	if(req.user && req.user.status == 4) {
+		control.hub(req, res);
+	}
+	else {
 		render.error(res);
-	});
+	}
 });
 //Создание статьи
 app.post('/create_article', function(req, res) {
-	authent(req).then(function(status) {
-		control.create_article(req, res, status);
-	}, function(err) {
+	if(req.user) {
+		control.create_article(req, res);
+	}
+	else {
 		render.error(res);
-	});
+	}
 });
 //Операции с черновой статьёй
 app.post('/draft/:name', function(req, res) {
-	checking.user(req).then(function(user_id) {
-		control.draft(req, res, user_id);
-	}, function(err) {
+	if(req.user) {
+		//ПЕРЕДЕЛАТЬ
+		control.draft(req, res, req.user.id);
+	}
+	else {
 		render.error(res);
-	});
+	}
 });
 //Отправка комментария
 app.post('/comment/:name', function(req, res) {
-	checking.user(req).then(function(user_id) {
-		control.comment(req, res, user_id);
-	}, function(err) {
+	if(req.user) {
+		control.comment(req, res);
+	}
+	else {
 		render.error(res);
-	});
+	}
 });
-//Редактирвоание профиля
+//Редактирование профиля
 app.post('/profile', function(req, res) {
-	checking.user(req).then(function(user_id) {
-		control.profile(req, res, user_id);
-	}, function(err) {
+	if(req.user) {
+		control.profile(req, res);
+	}
+	else {
 		render.error(res);
-	});
+	}
 });
 
 //Служебные ---------------------------------------------
