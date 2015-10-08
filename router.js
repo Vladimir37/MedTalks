@@ -85,12 +85,12 @@ app.get('/draft/:name', function(req, res) {
 });
 //Профиль юзера
 app.get('/user/:name', function(req, res) {
-	//
+	pages.user(req, res);
 });
 //Свой профиль
 app.get('/profile', function(req, res) {
 	if(req.user) {
-		pages.profile(res, req.user.id);
+		pages.profile(req, res);
 	}
 	else {
 		render.error(res);

@@ -1,0 +1,21 @@
+extends basis/layout
+
+block content
+	h1=data0.name
+	- var avatar;
+	- if(data0.avatar)
+		- avatar =  data0.id
+	- else 
+		- avatar = 'default'
+	img(src="/source/avatars/" + avatar + ".png", alt="avatar")
+	p О себе: #{data0.profile.description || 'НЕ УКАЗАНО'}
+	p Место жительства: #{data0.profile.place || 'НЕ УКАЗАНО'}
+	p Рейтинг: #{data0.rating}
+	p Статус: #{data0.status}
+	p Контакты: #{data0.profile.contact_type || 'НЕ УКАЗАНО'} #{data0.profile.contact_address || 'НЕ УКАЗАНО'}
+	p Подписан на:
+	ul
+		li Разделы: #{data0.profile.sub_hubs}
+		li Пользователей: #{data0.profile.sub_users}
+		li Теги: #{data0.profile.sub_tags}
+	p С нами с #{data0.createdAt}

@@ -115,6 +115,8 @@ tables.comments.belongsTo(tables.users, {foreignKey: 'author'});
 tables.articles.belongsTo(tables.users, {foreignKey: 'author'});
 //Хабы статей
 tables.articles.belongsTo(tables.hubs, {foreignKey: 'hubId'});
+//Профили с юзерами
+tables.users.hasOne(tables.profiles, {foreignKey: 'id'});
 
 //Синхронизация и создание всех таблиц
 for(table in tables) {

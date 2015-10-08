@@ -178,16 +178,26 @@ function list(req, res, params) {
 };
 
 //Просмотр своего профиля
-function profile(res, user_id) {
-	db.tables.users.findOne({where: {id: user_id}}).then(function(user_data) {
-		db.tables.profiles.findOne({where: {id: user_id}}).then(function(profile_data) {
-			render.jade(res, 'profile', user_data, profile_data);
-		}, function(err) {
-			serverError(err, res);
-		});
+function profile(req, res) {
+	render.jade(res, 'profile', req.user);
+};
+
+//Просмотр чужого профиля
+function user(req, res) {
+	var user_name = req.params.name;
+	db.tables.users.findOne({
+		where: {name: user_name}, 
+		include: [{model: db.tables.profiles}]
+	}).then(function(user_data) {
+		if(user_data) {
+			render.jade(res, 'user_profile', user_data);
+		}
+		else {
+			render.error(res);
+		}
 	}, function(err) {
 		serverError(err, res);
-	});
+	})
 };
 
 //Рендер ошибки и сообщение в консоль
@@ -201,3 +211,4 @@ exports.article = article;
 exports.draft_article = draft_article;
 exports.list = list;
 exports.profile = profile;
+exports.user = user;
