@@ -190,14 +190,14 @@ function user(req, res) {
 		include: [{model: db.tables.profiles}]
 	}).then(function(user_data) {
 		if(user_data) {
-			render.jade(res, 'user_profile', user_data);
+			render.jade(res, 'user_profile', user_data, req.user);
 		}
 		else {
 			render.error(res);
 		}
 	}, function(err) {
 		serverError(err, res);
-	})
+	});
 };
 
 //Рендер ошибки и сообщение в консоль

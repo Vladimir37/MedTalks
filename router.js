@@ -172,6 +172,15 @@ app.post('/profile', function(req, res) {
 		render.error(res);
 	}
 });
+//Подписка и отписка на юзера
+app.post('/user/:name', function(req, res) {
+	if(req.user) {
+		control.sub_user(req, res);
+	}
+	else {
+		render.error(res);
+	}
+});
 
 //Служебные ---------------------------------------------
 

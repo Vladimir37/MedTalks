@@ -43,7 +43,10 @@ function registration(req, res) {
 			mail(req.body.mail, 'Регистрация на MedTalks', 'Вы зарегистрированы. Перейдите по этой ссылке для подтверждения регистрации: <br><a href="http://localhost:3000/confirm/'+ key_mail +'">http://localhost:3000/confirm/'+ key_mail +'<a/>');
 			//Создание профиля
 			db.tables.profiles.create({
-				id: result.id
+				id: result.id,
+				sub_hubs: '[]',
+				sub_users: '[]',
+				sub_tags: '[]'
 			}).then(function() {
 				render.jade(res, 'registration_success');
 			}, function(err) {
@@ -374,6 +377,34 @@ function profile(req, res) {
 	});
 };
 
+//Подписка и отписка на юзера
+function subUser(req, res) {
+	var selected_user = req.params.name;
+	db.tables.profiles.findOne({where: {id: req.user.id}}).then(function(profile) {
+		var sub_user = JSON.parse(profile.sub_users);
+		var check_result = sub_user.indexOf(selected_user);
+		//Подписка
+		if(check_result == -1) {
+			sub_user.push(selected_user);
+			profile.sub_users = JSON.stringify(sub_user);
+			profile.save().then(function() {
+				render.jade(res, 'success/sub', selected_user);
+			});
+		}
+		//Отписка
+		else {
+			sub_user.splice(check_result, 1);
+			profile.sub_users = JSON.stringify(sub_user);
+			profile.save().then(function() {
+				render.jade(res, 'success/unsub', selected_user);
+			});
+		}
+	}, function(err) {
+		console.log(err);
+		render.server(err);
+	});
+};
+
 exports.registration = registration;
 exports.confirm = confirm;
 exports.auth = auth;
@@ -382,3 +413,4 @@ exports.create_article = createArticle;
 exports.draft = draftAction;
 exports.comment = addComment;
 exports.profile = profile;
+exports.sub_user = subUser;

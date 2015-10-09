@@ -19,3 +19,10 @@ block content
 		li Пользователей: #{data0.profile.sub_users}
 		li Теги: #{data0.profile.sub_tags}
 	p С нами с #{data0.createdAt}
+	- if(data1)
+		form(method="post")
+			- var sub_users = JSON.parse(data1.profile.sub_users)
+			- if(sub_users.indexOf(data0.name) == -1)
+				input(type="submit" value="Подписаться")
+			- else
+				input(type="submit" value="Отписаться")
