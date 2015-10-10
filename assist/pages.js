@@ -86,7 +86,7 @@ function list(req, res, params) {
 							total: Math.floor(articles.count / 10)
 						}
 						articles.rows = assist.imagesArr(articles.rows);
-						render.jade(res, 'hub_list', articles.rows, hub, page_data);
+						render.jade(res, 'hub_list', articles.rows, hub, page_data, req.user);
 					}
 					else {
 						render.error(res);
@@ -119,7 +119,7 @@ function list(req, res, params) {
 							total: Math.floor(articles.count / 10)
 						}
 						articles.rows = assist.imagesArr(articles.rows);
-						render.jade(res, 'author_list', articles.rows, user, page_data);
+						render.jade(res, 'author_list', articles.rows, user, page_data, req.user);
 					}
 					else {
 						render.error(res);
@@ -154,7 +154,7 @@ function list(req, res, params) {
 					total: Math.floor(articles.count / 10)
 				};
 				articles.rows = assist.imagesArr(articles.rows);
-				render.jade(res, 'tag_list', articles.rows, target_name, page_data);
+				render.jade(res, 'tag_list', articles.rows, target_name, page_data, req.user);
 			}
 			else {
 				render.error(res);

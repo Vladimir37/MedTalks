@@ -172,10 +172,29 @@ app.post('/profile', function(req, res) {
 		render.error(res);
 	}
 });
+//Подписки -----------------------------------
 //Подписка и отписка на юзера
 app.post('/user/:name', function(req, res) {
 	if(req.user) {
-		control.sub_user(req, res);
+		control.subscribe(req, res, 1);
+	}
+	else {
+		render.error(res);
+	}
+});
+//Подписка и отписка на тег
+app.post('/tag/:name', function(req, res) {
+	if(req.user) {
+		control.subscribe(req, res, 2);
+	}
+	else {
+		render.error(res);
+	}
+});
+//Подписка и отписка на хаб
+app.post('/hub/:name', function(req, res) {
+	if(req.user) {
+		control.subscribe(req, res, 3);
 	}
 	else {
 		render.error(res);

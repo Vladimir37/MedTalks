@@ -2,6 +2,13 @@ extends basis/layout
 
 block content
 	h1 Тег «#{data1}»
+	- if(data3)
+		form(action="/tag/" + data1 method="post")
+			- var sub_tags = JSON.parse(data3.profile.sub_tags)
+			- if(sub_tags.indexOf(data1) == -1)
+				input(type="submit" value="Подписаться")
+			- else
+				input(type="submit" value="Отписаться")
 	- each item in data0
 		h2=item.title
 		p Тэги - #{item.tags}

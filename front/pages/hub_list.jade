@@ -1,7 +1,14 @@
 extends basis/layout
 
 block content
-	h1 Раздел #{data1.name}
+	h1 Раздел «#{data1.name}»
+	- if(data3)
+		form(action="/hub/" + data1.name method="post")
+			- var sub_hubs = JSON.parse(data3.profile.sub_hubs)
+			- if(sub_hubs.indexOf(data1.name) == -1)
+				input(type="submit" value="Подписаться")
+			- else
+				input(type="submit" value="Отписаться")
 	- each item in data0
 		h2=item.title
 		p Тэги - #{item.tags}

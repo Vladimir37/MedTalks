@@ -369,7 +369,7 @@ function profile(req, res) {
 				render.server(res);
 			});
 		}
-		//Ошибка - редактирование без типа
+		//Ошибка: редактирование без типа
 		else {
 			console.log('Ошибка - редактирование без типа');
 			render.error(res);
@@ -377,26 +377,45 @@ function profile(req, res) {
 	});
 };
 
-//Подписка и отписка на юзера
-function subUser(req, res) {
-	var selected_user = req.params.name;
+//Подписка и отписка
+function subscribe(req, res, type) {
+	var target = req.params.name;
 	db.tables.profiles.findOne({where: {id: req.user.id}}).then(function(profile) {
-		var sub_user = JSON.parse(profile.sub_users);
-		var check_result = sub_user.indexOf(selected_user);
+		var sub_type;
+		switch(type) {
+			case 1:
+				//На юзера
+				sub_type = 'sub_users';
+				break;
+			case 2:
+				//На тег
+				sub_type = 'sub_tags';
+				break;
+			case 3:
+				//На хаб
+				sub_type = 'sub_hubs';
+				break;
+			default:
+				//Ошибка: подписка без типа
+				render.server(err);
+				break;
+		}
+		var sub_needed = JSON.parse(profile[sub_type]);
+		var check_result = sub_needed.indexOf(target);
 		//Подписка
 		if(check_result == -1) {
-			sub_user.push(selected_user);
-			profile.sub_users = JSON.stringify(sub_user);
+			sub_needed.push(target);
+			profile[sub_type] = JSON.stringify(sub_needed);
 			profile.save().then(function() {
-				render.jade(res, 'success/sub', selected_user);
+				render.jade(res, 'success/sub', target);
 			});
 		}
 		//Отписка
 		else {
-			sub_user.splice(check_result, 1);
-			profile.sub_users = JSON.stringify(sub_user);
+			sub_needed.splice(check_result, 1);
+			profile[sub_type] = JSON.stringify(sub_needed);
 			profile.save().then(function() {
-				render.jade(res, 'success/unsub', selected_user);
+				render.jade(res, 'success/unsub', target);
 			});
 		}
 	}, function(err) {
@@ -413,4 +432,4 @@ exports.create_article = createArticle;
 exports.draft = draftAction;
 exports.comment = addComment;
 exports.profile = profile;
-exports.sub_user = subUser;
+exports.subscribe = subscribe;
