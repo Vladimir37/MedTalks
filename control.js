@@ -440,24 +440,29 @@ function rating(req, res) {
 		if(result) {
 			var voters = JSON.parse(result.voters);
 			if(voters.indexOf(req.user.id) == -1) {
-				//Новый голос
-				if(r_change == 'plus') {
-					result.rating++;
-				}
-				else if(r_change == 'minus') {
-					result.rating--;
-				}
-				else {
-					render.error(res);
-				}
-				voters.push(req.user.id);
-				result.voters = JSON.stringify(voters);
-				result.save().then(function() {
-					render.jade(res, 'success/rating');
-				}, function(err) {
-					console.log(err);
-					render.server(res);
-				})
+				//Изменение рейтинга юзера
+				db.tables.users.findById(result.author).then(function(voter) {
+					//Новый голос
+					if(r_change == 'plus') {
+						result.rating++;
+						voter.increment('rating', {by: 1});
+					}
+					else if(r_change == 'minus') {
+						result.rating--;
+						voter.decrement('rating', {by: 1});
+					}
+					else {
+						render.error(res);
+					}
+					voters.push(req.user.id);
+					result.voters = JSON.stringify(voters);
+					result.save().then(function() {
+						render.jade(res, 'success/rating');
+					}, function(err) {
+						console.log(err);
+						render.server(res);
+					})
+				});
 			}
 			else {
 				//Этот юзер уже голосовал
