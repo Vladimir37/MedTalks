@@ -1,7 +1,26 @@
+//- Статья
 mixin article_full(article)
 	h1=article.title
 	h2 Автор - #{article.user.name}
 	h3 Хаб - #{article.hub.name}
+	b Рейтинг: #{article.rating}
+	form(action="/rating/articles/" + article.id method="post")
+		input(type="hidden" name="type" value="plus")
+		input(type="submit" value="Плюс")
+	form(action="/rating/articles/" + article.id method="post")
+		input(type="hidden" name="type" value="minus")
+		input(type="submit" value="Минус")
 	p Создано #{article.updatedAt}
 	p Теги: #{article.tags}
 	p!=article.text
+//- Комментарий
+mixin comment(comment)
+	h4=comment.user.name
+	b=comment.rating
+	form(action="/rating/comments/" + comment.id method="post")
+		input(type="hidden" name="type" value="plus")
+		input(type="submit" value="Плюс")
+	form(action="/rating/comments/" + comment.id method="post")
+		input(type="hidden" name="type" value="minus")
+		input(type="submit" value="Минус")
+	p!=comment.text

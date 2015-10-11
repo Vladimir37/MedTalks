@@ -172,6 +172,15 @@ app.post('/profile', function(req, res) {
 		render.error(res);
 	}
 });
+//Изменение рейтинга
+app.post('/rating/:type/:num', function(req, res) {
+	if(req.user) {
+		control.rating(req, res);
+	}
+	else {
+		render.error(res);
+	}
+});
 //Подписки -----------------------------------
 //Подписка и отписка на юзера
 app.post('/user/:name', function(req, res) {

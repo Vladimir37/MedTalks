@@ -183,7 +183,8 @@ function createArticle(req, res) {
 					hubId: fields.hub,
 					author: author_id,
 					status: article_status,
-					images: valid_files.length
+					images: valid_files.length,
+					voters: '[]'
 				}).then(function(result) {
 					render.jade(res, 'success/article');
 					var article_id = result.id;
@@ -317,7 +318,8 @@ function addComment(req, res) {
 			text: req.body.text,
 			article: num,
 			author: req.user.id,
-			answer: req.body.answer
+			answer: req.body.answer,
+			voters: '[]'
 		}).then(function() {
 			render.jade(res, 'success/comment');
 		}, function(err) {
@@ -408,6 +410,9 @@ function subscribe(req, res, type) {
 			profile[sub_type] = JSON.stringify(sub_needed);
 			profile.save().then(function() {
 				render.jade(res, 'success/sub', target);
+			}, function(err) {
+				console.log(err);
+				render.server(res);
 			});
 		}
 		//Отписка
@@ -424,6 +429,49 @@ function subscribe(req, res, type) {
 	});
 };
 
+//Изменения рейтинга
+function rating(req, res) {
+	var r_type = req.params.type;
+	var r_num = req.params.num;
+	var r_change = req.body.type;
+	db.tables[r_type].findOne({where: {
+		id: r_num
+	}}).then(function(result) {
+		if(result) {
+			var voters = JSON.parse(result.voters);
+			if(voters.indexOf(req.user.id) == -1) {
+				//Новый голос
+				if(r_change == 'plus') {
+					result.rating++;
+				}
+				else if(r_change == 'minus') {
+					result.rating--;
+				}
+				else {
+					render.error(res);
+				}
+				voters.push(req.user.id);
+				result.voters = JSON.stringify(voters);
+				result.save().then(function() {
+					render.jade(res, 'success/rating');
+				}, function(err) {
+					console.log(err);
+					render.server(res);
+				})
+			}
+			else {
+				//Этот юзер уже голосовал
+				render.error(res);
+			}
+		}
+		else {
+			render.error(res);
+		}
+	}, function(err) {
+		render.error(res);
+	})
+};
+
 exports.registration = registration;
 exports.confirm = confirm;
 exports.auth = auth;
@@ -433,3 +481,4 @@ exports.draft = draftAction;
 exports.comment = addComment;
 exports.profile = profile;
 exports.subscribe = subscribe;
+exports.rating = rating;

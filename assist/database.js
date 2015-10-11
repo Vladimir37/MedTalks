@@ -62,6 +62,7 @@ tables.articles = sequelize.define('articles', {
 		type: Sequelize.INTEGER,
 		defaultValue: 0
 	},
+	voters: Sequelize.TEXT,
 	images: {
 		type: Sequelize.INTEGER,
 		defaultValue: 0
@@ -80,7 +81,8 @@ tables.comments = sequelize.define('comments', {
 	rating: {
 		type: Sequelize.INTEGER,
 		defaultValue: 0
-	}
+	},
+	voters: Sequelize.TEXT
 });
 
 tables.hubs = sequelize.define('hubs', {
