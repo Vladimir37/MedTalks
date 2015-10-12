@@ -79,7 +79,9 @@ function confirm(res, key) {
 			user_status = 1;
 		}
 		//Запись в базу
-		db.tables.users.update({status: user_status}, {where: {id: user_id}}).then(function() {
+		db.tables.users.update({status: user_status}, {
+				where: {id: user_id}
+		}).then(function() {
 			res.redirect('/confirm#success');
 		}, function(err) {
 			console.log(err);
@@ -152,7 +154,11 @@ function createArticle(req, res) {
 		render.jade(res, 'errors/eConfirm');
 	}
 	else {
-		var form = new formidable.IncomingForm({encoding: 'utf-8', uploadDir: 'temp', keepExtensions: true});
+		var form = new formidable.IncomingForm({
+			encoding: 'utf-8', 
+			uploadDir: 'temp', 
+			keepExtensions: true
+		});
 		form.parse(req, function(err, fields, files) {
 			//Обработка изображений
 			var valid_files = [];
@@ -218,14 +224,19 @@ function createArticle(req, res) {
 //Операции с черновой статьёй
 function draftAction(req, res, user) {
 	var num = req.params.name;
-	db.tables.articles.findOne({where: {id: num, author: user, status: 0}}).then(function(result) {
-		authent(req).then(function(status) {
+	db.tables.articles.findOne({
+		where: {
+			id: num, 
+			author: user, 
+			status: 0
+		}
+	}).then(function(result) {
+		if(req.user) {
 			if(result != null) {
 				var article_status = 2;
-				if(status == 1) {
+				if(req.user.status == 1) {
 					article_status = 1;
 				}
-				console.log(req.body.type);
 				switch(req.body.type) {
 					case '1':
 						//Публикация
@@ -258,7 +269,10 @@ function draftAction(req, res, user) {
 			else {
 				render.error(res);
 			}
-		});
+		}
+		else {
+			render.error(res);
+		}
 	}, function(err) {
 		render.server(res);
 	});
@@ -266,7 +280,11 @@ function draftAction(req, res, user) {
 
 //Сохранение редактирования
 function editingDraft(req, res, num) {
-	var form = new formidable.IncomingForm({encoding: 'utf-8', uploadDir: 'temp', keepExtensions: true});
+	var form = new formidable.IncomingForm({
+		encoding: 'utf-8', 
+		uploadDir: 'temp', 
+		keepExtensions: true
+	});
 	form.parse(req, function(err, fields, files) {
 		//Обработка изображений
 		var valid_files = [];
@@ -339,7 +357,11 @@ function addComment(req, res) {
 //Редактирование профиля
 function profile(req, res) {
 	var user_id = req.user.id;
-	var form = new formidable.IncomingForm({encoding: 'utf-8', uploadDir: 'temp', keepExtensions: true});
+	var form = new formidable.IncomingForm({
+		encoding: 'utf-8', 
+		uploadDir: 'temp', 
+		keepExtensions: true
+	});
 	form.parse(req, function(err, fields, files) {
 		//Загрузка аватара
 		if(fields.type == 1) {
@@ -487,24 +509,46 @@ function sandbox(req, res) {
 	var action = req.body.action;
 	if(action == 1) {
 		//Публикация
-		db.tables.articles.update({
-			status: 2
-		}, {
-			where: {id: num}
-		}).then(function() {
-			render.jade(res, 'success/articles');
-			db.tables.articles.findById(num).then(function(article) {
-				db.tables.users.findById(article.author).then(function(user) {
-					user.increment('articles_count', {by: 1});
-					console.log(user);
-				});
+		db.tables.articles.findById(num).then(function(article) {
+			article.increment('status', {by: 1});
+			render.jade(res, 'success/article');
+			db.tables.users.findById(article.author).then(function(user) {
+				user.increment('articles_count', {by: 1});
+				var letter_obj = {
+					name: user.name,
+					article: article.title,
+					num: article.id
+				};
+				mail(user.mail, 'Статья принята', 'approve', letter_obj);
+				if(++user.articles_count >= config.articles_for_confirm) {
+					user.increment('status', {by: 1});
+					var letter_obj = {
+						name: user.name
+					};
+					mail(user.mail, 'Вы повышены!', 'raise', letter_obj);
+				}
 			});
 		}, function(err) {
-		render.error(res);
-	});
+		render.server(res);
+		});
 	}
 	else if(action == 0) {
 		//Отклонение
+		var reason = req.body.reason;
+		db.tables.articles.findById(num).then(function(article) {
+			article.decrement('status', {by: 1});
+			render.jade(res, 'success/refuse');
+			db.tables.users.findById(article.author).then(function(user) {
+				var letter_obj = {
+					name: user.name,
+					article: article.title,
+					reason: reason
+				};
+				mail(user.mail, 'Статья отклонена', 'refuse', letter_obj);
+			});
+		}, function(err) {
+		render.server(res);
+		});
 	}
 	else {
 		//Ошибка: действие без типа
