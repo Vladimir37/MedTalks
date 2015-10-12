@@ -5,7 +5,6 @@ var formidable = require('formidable');
 var fs = require('fs');
 var ei = require('easyimage');
 
-var authent = require('./assist/authent');
 var render = require('./render');
 var pages = require('./assist/pages');
 var db = require('./assist/database');
@@ -170,52 +169,47 @@ function createArticle(req, res) {
 			};
 
 			//Получение автора
-			checking.user(req).then(function(result) {
-				var author_id = result;
-				//Определение статуса статьи
-				var article_status;
-				if(fields.draft) {
-					article_status = 0
-				}
-				else if(status == 1) {
-					article_status = 1
-				}
-				else {
-					article_status = 2
-				}
-				//Удаление html разметки
-				fields = assist.safety(fields);
-				//Создание записи в базе
-				db.tables.articles.create({
-					title: fields.title,
-					text: fields.text,
-					tags: fields.tags,
-					hubId: fields.hub,
-					author: author_id,
-					status: article_status,
-					images: valid_files.length,
-					voters: '[]'
-				}).then(function(result) {
-					render.jade(res, 'success/article');
-					var article_id = result.id;
-					fs.mkdir('front/source/illustrations/' + article_id, function(err) {
-						if(err) {
-							console.log(err);
+			var author_id = req.user.id;
+			//Определение статуса статьи
+			var article_status;
+			if(fields.draft) {
+				article_status = 0
+			}
+			else if(status == 1) {
+				article_status = 1
+			}
+			else {
+				article_status = 2
+			}
+			//Удаление html разметки
+			fields = assist.safety(fields);
+			//Создание записи в базе
+			db.tables.articles.create({
+				title: fields.title,
+				text: fields.text,
+				tags: fields.tags,
+				hubId: fields.hub,
+				author: author_id,
+				status: article_status,
+				images: valid_files.length,
+				voters: '[]'
+			}).then(function(result) {
+				render.jade(res, 'success/article');
+				var article_id = result.id;
+				fs.mkdir('front/source/illustrations/' + article_id, function(err) {
+					if(err) {
+						console.log(err);
+					}
+					else {
+						//Создание валидных изображений
+						for(var i = 0; i < valid_files.length; i++) {
+							ei.convert({
+								src: valid_files[i].path,
+								dst: './front/source/illustrations/' + article_id + '/img' + i + '.png'
+							});
 						}
-						else {
-							//Создание валидных изображений
-							for(var i = 0; i < valid_files.length; i++) {
-								ei.convert({
-									src: valid_files[i].path,
-									dst: './front/source/illustrations/' + article_id + '/img' + i + '.png'
-								});
-							}
-						}
-					})
-				});
-			}, function(err) {
-				console.log(err);
-				render.server(res);
+					}
+				})
 			});
 		});
 	}
@@ -344,6 +338,9 @@ function addComment(req, res) {
 			voters: '[]'
 		}).then(function() {
 			render.jade(res, 'success/comment');
+			db.tables.users.findById(req.user.id).then(function(user) {
+				user.increment('comments_count', {by: 1});
+			});
 		}, function(err) {
 			console.log(err);
 			render.server(res);

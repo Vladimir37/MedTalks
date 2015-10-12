@@ -14,6 +14,8 @@ block content
 		input(type="file" name="avatar" required)
 		input(type="submit" value="Загрузить")
 	p Ваш ник: #{data0.name}
+	p Создано статей: #{data0.articles_count}
+	p Написано комментариев: #{data0.comments_count}
 	form(method="post" enctype="multipart/form-data")
 		input(type="hidden" name="type" value="2")
 		p Вы о себе: 

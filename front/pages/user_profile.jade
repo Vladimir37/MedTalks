@@ -18,6 +18,8 @@ block content
 		li Разделы: #{data0.profile.sub_hubs}
 		li Пользователей: #{data0.profile.sub_users}
 		li Теги: #{data0.profile.sub_tags}
+	p Создано статей: #{data0.articles_count}
+	p Написано комментариев: #{data0.comments_count}
 	p С нами с #{data0.createdAt}
 	- if(data1)
 		form(method="post")

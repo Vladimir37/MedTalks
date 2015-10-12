@@ -1,9 +1,9 @@
 extends basis/layout
 
 block content
-	mixin article_full(data0)
+	mixin article_full(data0, data2)
 	- each item, i in data1
-		mixin comment(item)
+		mixin comment(item, data2)
 	article.comment_create
 		form(action="/comment/" + data0.id method="post")
 			input(type="hidden" name="answer" value=null)

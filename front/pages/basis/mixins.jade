@@ -1,15 +1,26 @@
 //- Статья
-mixin article_full(article)
+mixin article_full(article, user_data)
 	h1=article.title
 	h2 Автор - #{article.user.name}
 	h3 Хаб - #{article.hub.name}
 	b Рейтинг: #{article.rating}
-	form(action="/rating/articles/" + article.id method="post")
-		input(type="hidden" name="type" value="plus")
-		input(type="submit" value="Плюс")
-	form(action="/rating/articles/" + article.id method="post")
-		input(type="hidden" name="type" value="minus")
-		input(type="submit" value="Минус")
+	- if(user_data)
+		- if(article.vote == 1)
+			form(action="/rating/articles/" + article.id method="post")
+				input(type="hidden" name="type" value="plus")
+				input(type="submit" value="Плюс")
+			form(action="/rating/articles/" + article.id method="post")
+				input(type="hidden" name="type" value="minus")
+				input(type="submit" value="Минус")
+		- else
+			h4 Вы уже голосовали
+	p Создано #{article.updatedAt}
+	p Теги: #{article.tags}
+	p!=article.text
+//- Статья в черновике
+mixin article_draft(article)
+	h1=article.title
+	h3 Хаб - #{article.hub.name}
 	p Создано #{article.updatedAt}
 	p Теги: #{article.tags}
 	p!=article.text
@@ -30,13 +41,17 @@ mixin article_sandbox(article)
 		br
 		input(type="submit" value="Отклонить")
 //- Комментарий
-mixin comment(comment)
+mixin comment(comment, user_data)
 	h4=comment.user.name
 	b=comment.rating
-	form(action="/rating/comments/" + comment.id method="post")
-		input(type="hidden" name="type" value="plus")
-		input(type="submit" value="Плюс")
-	form(action="/rating/comments/" + comment.id method="post")
-		input(type="hidden" name="type" value="minus")
-		input(type="submit" value="Минус")
+	- if(user_data)
+		- if(comment.vote == 1)
+			form(action="/rating/comments/" + comment.id method="post")
+				input(type="hidden" name="type" value="plus")
+				input(type="submit" value="Плюс")
+			form(action="/rating/comments/" + comment.id method="post")
+				input(type="hidden" name="type" value="minus")
+				input(type="submit" value="Минус")
+		- else
+			h5 Вы уже голосовали!
 	p!=comment.text

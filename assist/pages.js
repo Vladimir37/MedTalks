@@ -27,7 +27,23 @@ function article(req, res) {
 				where: {article: num}, 
 				include: [{model: db.tables.users}]
 			}).then(function(comments) {
-				render.jade(res, 'article', article, comments);
+				//Проверка на возможность голосовать
+				//Комменты
+				comments.forEach(function(item) {
+					item.vote = 0;
+					var com_voters = JSON.parse(item.voters);
+					if(com_voters.indexOf(req.user.id) == -1) {
+						item.vote = 1;
+					}
+				});
+				//Статья
+				article.vote = 0;
+				var art_voters = JSON.parse(article.voters);
+				if(art_voters.indexOf(req.user.id) == -1) {
+					article.vote = 1;
+				}
+				//Рендер
+				render.jade(res, 'article', article, comments, req.user);
 			}, function(err) {
 				serverError(err, res);
 			});
