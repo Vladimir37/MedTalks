@@ -7,8 +7,14 @@ var assist = require('./assist');
 function article(req, res) {
 	var num = req.params.name;
 	db.tables.articles.findOne({
-		where: {id: num, status: 2}, 
-		include: [{model: db.tables.hubs}, {model: db.tables.users}]
+		where: {
+			id: num, 
+			status: 2
+		}, 
+		include: [
+			{model: db.tables.hubs}, 
+			{model: db.tables.users}
+		]
 	}).then(function(article) {
 		if(article == null) {
 			render.error(res);
@@ -175,11 +181,36 @@ function list(req, res, params) {
 			serverError(err, res);
 		});
 	}
-};
-
-//Просмотр своего профиля
-function profile(req, res) {
-	render.jade(res, 'profile', req.user);
+	//Песочница
+	else if(params.type == 5) {
+		db.tables.articles.findAndCountAll({
+			where: {
+				status: 1
+			},
+			offset: start_article,
+			limit: 10,
+			order: [['updatedAt', 'DESC']],
+			include: [{model: db.tables.hubs}, {model: db.tables.users}]
+		}).then(function(articles) {
+			if(articles.rows) {
+				var page_data = {
+					current: params.page,
+					total: Math.floor(articles.count / 10)
+				};
+				articles.rows = assist.imagesArr(articles.rows);
+				render.jade(res, 'sandbox_list', articles.rows, target_name, page_data, req.user);
+			}
+			else {
+				render.error(res);
+			}
+		}, function(err) {
+			serverError(err, res);
+		});
+	}
+	//Ошибка: Список без типа
+	else {
+		render.error(res);
+	}
 };
 
 //Просмотр чужого профиля
@@ -200,6 +231,25 @@ function user(req, res) {
 	});
 };
 
+//Просмотр статьи в песочнице
+function sandbox(req, res) {
+	var num = req.params.name;
+	db.tables.articles.findOne({
+		where: {
+			id: num,
+			status: 1
+		},
+		include: [
+			{model: db.tables.hubs}, 
+			{model: db.tables.users}
+		]
+	}).then(function(article) {
+		render.jade(res, 'sandbox_item', article);
+	}, function(err) {
+		serverError(err, res);
+	});
+};
+
 //Рендер ошибки и сообщение в консоль
 function serverError(err, res) {
 	console.log(err);
@@ -210,5 +260,5 @@ exports.create_article = create_article;
 exports.article = article;
 exports.draft_article = draft_article;
 exports.list = list;
-exports.profile = profile;
 exports.user = user;
+exports.sandbox = sandbox;

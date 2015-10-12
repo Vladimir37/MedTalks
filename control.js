@@ -11,7 +11,7 @@ var pages = require('./assist/pages');
 var db = require('./assist/database');
 var config = require('./configs/app_config');
 var checking = require('./assist/checking');
-var mail = require('./assist/mail').send;
+var mail = require('./assist/mail');
 var assist = require('./assist/assist');
 
 //Создание Redis-клиента
@@ -39,8 +39,12 @@ function registration(req, res) {
 		}).then(function(result) {
 			//Отправка письма с подтверждением
 			var key_mail = result.key + '_' + result.id;
-			//Отправка письма. ПЕРЕДЕЛАТЬ
-			mail(req.body.mail, 'Регистрация на MedTalks', 'Вы зарегистрированы. Перейдите по этой ссылке для подтверждения регистрации: <br><a href="http://localhost:3000/confirm/'+ key_mail +'">http://localhost:3000/confirm/'+ key_mail +'<a/>');
+			//Отправка письма
+			var letter_obj = {
+				key: key_mail,
+				name: req.body.login
+			};
+			mail(req.body.mail, 'Регистрация на MedTalks', 'registration', letter_obj);
 			//Создание профиля
 			db.tables.profiles.create({
 				id: result.id,
@@ -401,7 +405,7 @@ function subscribe(req, res, type) {
 				//Ошибка: подписка без типа
 				render.server(err);
 				break;
-		}
+		};
 		var sub_needed = JSON.parse(profile[sub_type]);
 		var check_result = sub_needed.indexOf(target);
 		//Подписка
@@ -477,6 +481,11 @@ function rating(req, res) {
 	})
 };
 
+//Операции со статьями в песочнице
+function sandbox(req, res) {
+	//
+};
+
 exports.registration = registration;
 exports.confirm = confirm;
 exports.auth = auth;
@@ -487,3 +496,4 @@ exports.comment = addComment;
 exports.profile = profile;
 exports.subscribe = subscribe;
 exports.rating = rating;
+exports.sandbox = sandbox;

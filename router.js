@@ -83,6 +83,33 @@ app.get('/draft/:name', function(req, res) {
 		render.error(res);
 	}
 });
+//Просмотр песочницы для админов
+app.get('/sandbox', function(req, res) {
+	if(req.user.status >= 3) {
+		pages.list(req, res, {type: 5, page: 0});
+	}
+	else {
+		render.error(res);
+	}
+});
+app.get('/sandbox/:num', function(req, res) {
+	if(req.user.status >= 3) {
+		var page_num = req.params.num;
+		pages.list(req, res, {type: 5, page: page_num});
+	}
+	else {
+		render.error(res);
+	}
+});
+//Статья в песочнице
+app.get('/sandbox_item/:name', function(req, res) {
+	if(req.user.status >= 3) {
+		pages.sandbox(req, res);
+	}
+	else {
+		render.error(res);
+	}
+});
 //Профиль юзера
 app.get('/user/:name', function(req, res) {
 	pages.user(req, res);
@@ -90,7 +117,7 @@ app.get('/user/:name', function(req, res) {
 //Свой профиль
 app.get('/profile', function(req, res) {
 	if(req.user) {
-		pages.profile(req, res);
+		render.jade(res, 'profile', req.user);
 	}
 	else {
 		render.error(res);
@@ -176,6 +203,15 @@ app.post('/profile', function(req, res) {
 app.post('/rating/:type/:num', function(req, res) {
 	if(req.user) {
 		control.rating(req, res);
+	}
+	else {
+		render.error(res);
+	}
+});
+//Операции со статьями в песочнице
+app.post('/sandbox_item/:name', function(req, res) {
+	if(req.user.status >= 3) {
+		control.sandbox(req, res);
 	}
 	else {
 		render.error(res);

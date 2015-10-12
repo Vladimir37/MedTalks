@@ -13,6 +13,20 @@ mixin article_full(article)
 	p Создано #{article.updatedAt}
 	p Теги: #{article.tags}
 	p!=article.text
+//- Статья в песочнице
+mixin article_sandbox(article)
+	h1=article.title
+	h2 Автор - #{article.user.name}
+	h3 Хаб - #{article.hub.name}
+	p Создано #{article.updatedAt}
+	p Теги: #{article.tags}
+	p!=article.text
+	form(method="post")
+		input(type="hidden" name="action" value="1")
+		input(type="submit" value="Опубликовать")
+	form(method="post")
+		input(type="hidden" name="action" value="0")
+		input(type="submit" value="Отклонить")
 //- Комментарий
 mixin comment(comment)
 	h4=comment.user.name
