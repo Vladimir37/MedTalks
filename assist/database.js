@@ -40,6 +40,14 @@ tables.users = sequelize.define('users', {
 		type: Sequelize.INTEGER,
 		defaultValue: 0
 	},
+	articles_count: {
+		type: Sequelize.INTEGER,
+		defaultValue: 0
+	},
+	comments_count: {
+		type: Sequelize.INTEGER,
+		defaultValue: 0
+	},
 	ban: {
 		type: Sequelize.INTEGER,
 		defaultValue: 0

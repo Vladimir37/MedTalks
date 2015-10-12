@@ -483,7 +483,33 @@ function rating(req, res) {
 
 //Операции со статьями в песочнице
 function sandbox(req, res) {
-	//
+	var num = req.params.name;
+	var action = req.body.action;
+	if(action == 1) {
+		//Публикация
+		db.tables.articles.update({
+			status: 2
+		}, {
+			where: {id: num}
+		}).then(function() {
+			render.jade(res, 'success/articles');
+			db.tables.articles.findById(num).then(function(article) {
+				db.tables.users.findById(article.author).then(function(user) {
+					user.increment('articles_count', {by: 1});
+					console.log(user);
+				});
+			});
+		}, function(err) {
+		render.error(res);
+	});
+	}
+	else if(action == 0) {
+		//Отклонение
+	}
+	else {
+		//Ошибка: действие без типа
+		render.error(res);
+	}
 };
 
 exports.registration = registration;

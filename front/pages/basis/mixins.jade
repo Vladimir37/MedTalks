@@ -26,6 +26,8 @@ mixin article_sandbox(article)
 		input(type="submit" value="Опубликовать")
 	form(method="post")
 		input(type="hidden" name="action" value="0")
+		textarea(name="reason" placeholder="Причины (при отклонении)")
+		br
 		input(type="submit" value="Отклонить")
 //- Комментарий
 mixin comment(comment)

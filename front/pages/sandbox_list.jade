@@ -12,9 +12,9 @@ block content
 		br
 	- if(data2.current != 0)
 		- var prev = +data2.current - 1
-		a(href="/sandbox/" + data1 + '/' + prev)
+		a(href="/sandbox/" + prev)
 			input(type="button" value="Предыдущая")
 	- if(data2.current != data2.total)
 		- var next = +data2.current + 1
-		a(href="/sandbox/" + data1 + '/' + next)
+		a(href="/sandbox/" + next)
 			input(type="button" value="Следующая")

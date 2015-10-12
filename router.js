@@ -85,7 +85,7 @@ app.get('/draft/:name', function(req, res) {
 });
 //Просмотр песочницы для админов
 app.get('/sandbox', function(req, res) {
-	if(req.user.status >= 3) {
+	if(req.user && req.user.status >= 3) {
 		pages.list(req, res, {type: 5, page: 0});
 	}
 	else {
@@ -93,7 +93,7 @@ app.get('/sandbox', function(req, res) {
 	}
 });
 app.get('/sandbox/:num', function(req, res) {
-	if(req.user.status >= 3) {
+	if(req.user && req.user.status >= 3) {
 		var page_num = req.params.num;
 		pages.list(req, res, {type: 5, page: page_num});
 	}
@@ -103,7 +103,7 @@ app.get('/sandbox/:num', function(req, res) {
 });
 //Статья в песочнице
 app.get('/sandbox_item/:name', function(req, res) {
-	if(req.user.status >= 3) {
+	if(req.user && req.user.status >= 3) {
 		pages.sandbox(req, res);
 	}
 	else {
@@ -210,7 +210,7 @@ app.post('/rating/:type/:num', function(req, res) {
 });
 //Операции со статьями в песочнице
 app.post('/sandbox_item/:name', function(req, res) {
-	if(req.user.status >= 3) {
+	if(req.user && req.user.status >= 3) {
 		control.sandbox(req, res);
 	}
 	else {
