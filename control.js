@@ -97,7 +97,7 @@ function auth(req, res) {
 	var enter_login = req.body.login;
 	var enter_pass = req.body.pass;
 	db.tables.users.findOne({where: {mail: enter_login}}).then(function(result) {
-		if(result && crypt_pass.decrypt(result.pass) == enter_pass) {
+		if(result && crypt_pass.decrypt(result.pass) == enter_pass && result.ban == 0) {
 			if(result.status != 0) {
 				var cookie_data = {};
 				if(req.body.remember) {
@@ -151,6 +151,9 @@ function createArticle(req, res) {
 	var status = req.user.status;
 	if(status == 0) {
 		render.jade(res, 'errors/eConfirm');
+	}
+	else if(req.user.ban == 1) {
+		render.jade(res, 'errors/eBan');
 	}
 	else {
 		var form = new formidable.IncomingForm({
@@ -230,6 +233,9 @@ function draftAction(req, res, user) {
 				var article_status = 2;
 				if(req.user.status == 1) {
 					article_status = 1;
+				}
+				else if(req.user.ban == 1) {
+					article_status = 0;
 				}
 				switch(req.body.type) {
 					case '1':
@@ -329,7 +335,7 @@ function editingDraft(req, res, num) {
 //Создание комментария
 function addComment(req, res) {
 	var num = req.params.name;
-	if(req.body.text) {
+	if(req.body.text && req.user.ban == 0) {
 		db.tables.comments.create({
 			text: req.body.text,
 			article: num,

@@ -101,6 +101,24 @@ app.get('/sandbox/:num', function(req, res) {
 		render.error(res);
 	}
 });
+//Личная лента юзера
+app.get('/roll', function (req, user) {
+	if(req.user) {
+		pages.list(req, res, {type: 6, page: 0});
+	}
+	else {
+		render.error(res);
+	}
+});
+app.get('/roll/:num', function (req, user) {
+	if(req.user) {
+		var page_num = req.params.num;
+		pages.list(req, res, {type: 6, page: page_num});
+	}
+	else {
+		render.error(res);
+	}
+});
 //Статья в песочнице
 app.get('/sandbox_item/:name', function(req, res) {
 	if(req.user && req.user.status >= 3) {

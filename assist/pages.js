@@ -223,6 +223,10 @@ function list(req, res, params) {
 			serverError(err, res);
 		});
 	}
+	//Личная лента
+	else if(params.type == 6) {
+		
+	}
 	//Ошибка: Список без типа
 	else {
 		render.error(res);
