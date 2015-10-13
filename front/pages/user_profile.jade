@@ -20,6 +20,9 @@ block content
 		li Теги: #{data0.profile.sub_tags}
 	p Создано статей: #{data0.articles_count}
 	p Написано комментариев: #{data0.comments_count}
+	- if(data0.articles_count > 0)
+		p 
+			a(href="/author/" + data0.name) Все статьи пользователя
 	p С нами с #{data0.createdAt}
 	- if(data1)
 		form(method="post")
@@ -28,3 +31,6 @@ block content
 				input(type="submit" value="Подписаться")
 			- else
 				input(type="submit" value="Отписаться")
+		- if(data1.status >= 3 && data0.ban == 0)
+			form(action="/ban/" + data0.id method="post")
+				input(type="submit" value="Забанить")

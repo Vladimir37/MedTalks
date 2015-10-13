@@ -245,6 +245,14 @@ app.post('/hub/:name', function(req, res) {
 		render.error(res);
 	}
 });
+app.post('/ban/:name', function(req, res) {
+	if(req.user && req.user.status >= 3) {
+		control.ban(req, res);
+	}
+	else {
+		render.error(res);
+	}
+});
 
 //Служебные ---------------------------------------------
 

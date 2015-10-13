@@ -81,14 +81,14 @@ function confirm(res, key) {
 		db.tables.users.update({status: user_status}, {
 				where: {id: user_id}
 		}).then(function() {
-			res.redirect('/confirm#success');
+			render.jade(res, 'success/confirm');
 		}, function(err) {
 			console.log(err);
 			render.server(res);
 		})
 	}, function(err) {
 		console.log(err);
-		res.redirect('/confirm#error');
+		render.error(res);
 	});
 };
 
@@ -113,7 +113,7 @@ function auth(req, res) {
 			}
 		}
 		else {
-			res.redirect('/login#incorrect');
+			render.jade(res, 'errors/eLogin');
 		}
 	}, function(err) {
 		console.log(err);
@@ -297,7 +297,7 @@ function editingDraft(req, res, num) {
 			tags: fields.tags,
 			hub: fields.hub
 		}, {where: {id: num}}).then(function() {
-			db.tables.articles.findOne({where: {id: num}}).then(function(article) {
+			db.tables.articles.findById(num).then(function(article) {
 			//Создание валидных изображений
 				var sum_images = valid_files.length + article.images;
 				var j = 0;
@@ -457,9 +457,7 @@ function rating(req, res) {
 	var r_type = req.params.type;
 	var r_num = req.params.num;
 	var r_change = req.body.type;
-	db.tables[r_type].findOne({where: {
-		id: r_num
-	}}).then(function(result) {
+	db.tables[r_type].findById(r_num).then(function(result) {
 		if(result) {
 			var voters = JSON.parse(result.voters);
 			if(voters.indexOf(req.user.id) == -1) {
@@ -526,7 +524,7 @@ function sandbox(req, res) {
 				}
 			});
 		}, function(err) {
-		render.server(res);
+			render.server(res);
 		});
 	}
 	else if(action == 0) {
@@ -544,13 +542,24 @@ function sandbox(req, res) {
 				mail(user.mail, 'Статья отклонена', 'refuse', letter_obj);
 			});
 		}, function(err) {
-		render.server(res);
+			render.server(res);
 		});
 	}
 	else {
 		//Ошибка: действие без типа
 		render.error(res);
 	}
+};
+
+//Бан
+function ban(req, res) {
+	var num = req.params.name;
+	db.tables.users.findById(num).then(function(user) {
+		user.increment('ban', {by: 1});
+		render.jade(res, 'success/ban', user.name);
+	}, function(err) {
+		render.server(res);
+	});
 };
 
 exports.registration = registration;
@@ -564,3 +573,4 @@ exports.profile = profile;
 exports.subscribe = subscribe;
 exports.rating = rating;
 exports.sandbox = sandbox;
+exports.ban = ban;
