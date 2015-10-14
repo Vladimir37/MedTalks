@@ -106,7 +106,7 @@ function auth(req, res) {
 				redis.set(result.name, result.status);
 				redis.expire(result.name, 1210000);
 				res.cookie('mt_login', crypt_auth.encrypt(result.name), cookie_data);
-				res.redirect('/');
+				res.redirect('/roll');
 			}
 			else {
 				render.jade(res, 'errors/eConfirm');
@@ -568,6 +568,43 @@ function ban(req, res) {
 	});
 };
 
+//Операции с паролем
+function pass(req, res) {
+	var act_type = req.body.type;
+	var act_mail = req.body.mail;
+	//Напоминание
+	if(act_type == 1) {
+		db.tables.users.findOne({where: {
+			mail: act_mail
+		}}).then(function(user) {
+			if(user) {
+				var password = crypt_pass.decrypt(user.pass);
+				var letter_obj = {
+					name: user.name,
+					log: user.mail,
+					pass: password
+				};
+				mail(user.mail, 'Восстановление доступа', 'pass_remind', letter_obj);
+				render.jade(res, 'success/pass');
+			}
+			else {
+				render.jade(res, 'errors/ePass');
+			}
+		}, function(err) {
+			console.log(err);
+			render.server(res);
+		});
+	}
+	//Изменение
+	else if(act_type == 2) {
+		//
+	}
+	//Ошибка: операция без типа
+	else {
+		render.error(res);
+	}
+};
+
 exports.registration = registration;
 exports.confirm = confirm;
 exports.auth = auth;
@@ -580,3 +617,4 @@ exports.subscribe = subscribe;
 exports.rating = rating;
 exports.sandbox = sandbox;
 exports.ban = ban;
+exports.pass = pass;

@@ -1,0 +1,9 @@
+extends basis/layout
+
+block content
+	h1 Напомнить забытый пароль
+	form(method="post")
+		input(type="hidden" name="type" value="1")
+		input(type="text" name="mail" placeholder="Введите вашу почту" required)
+		br
+		input(type="submit" value="Напомнить")

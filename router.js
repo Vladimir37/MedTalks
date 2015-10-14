@@ -37,6 +37,10 @@ app.get('/registration', function(req, res) {
 app.get('/login', function(req, res) {
 	render.jade(res, 'login');
 });
+//Напомнить пароль
+app.get('/pass', function(req, res) {
+	render.jade(res, 'pass_remind');
+});
 //Просмотр статьи
 app.get('/article/:name', function(req, res) {
 	pages.article(req, res);
@@ -234,6 +238,10 @@ app.post('/sandbox_item/:name', function(req, res) {
 	else {
 		render.error(res);
 	}
+});
+//Операции с паролем
+app.post('/pass', function(req, res) {
+	control.pass(req, res);
 });
 //Подписки -----------------------------------
 //Подписка и отписка на юзера
