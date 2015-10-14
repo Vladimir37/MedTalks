@@ -12,6 +12,8 @@ mixin article_full(article, user_data)
 			form(action="/rating/articles/" + article.id method="post")
 				input(type="hidden" name="type" value="minus")
 				input(type="submit" value="Минус")
+		- else if(article.vote == 2)
+			h4 Вы не можете голосовать за себя
 		- else
 			h4 Вы уже голосовали
 	p Создано #{article.updatedAt}
@@ -52,6 +54,8 @@ mixin comment(comment, user_data)
 			form(action="/rating/comments/" + comment.id method="post")
 				input(type="hidden" name="type" value="minus")
 				input(type="submit" value="Минус")
+		- else if(comment.vote == 2)
+			h5 Вы не можете голосовать за себя!
 		- else
 			h5 Вы уже голосовали!
 	p!=comment.text

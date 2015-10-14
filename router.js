@@ -41,6 +41,15 @@ app.get('/login', function(req, res) {
 app.get('/pass', function(req, res) {
 	render.jade(res, 'pass_remind');
 });
+//Изменить пароль
+app.get('/pass_change', function(req, res) {
+	if(req.user) {
+		render.jade(res, 'pass_change');
+	}
+	else {
+		render.error(res);
+	}
+});
 //Просмотр статьи
 app.get('/article/:name', function(req, res) {
 	pages.article(req, res);

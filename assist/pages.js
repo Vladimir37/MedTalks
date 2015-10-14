@@ -32,14 +32,20 @@ function article(req, res) {
 				comments.forEach(function(item) {
 					item.vote = 0;
 					var com_voters = JSON.parse(item.voters);
-					if(com_voters.indexOf(req.user.id) == -1) {
+					if(item.author == req.user.id) {
+						item.vote = 2;
+					}
+					else if(com_voters.indexOf(req.user.id) == -1) {
 						item.vote = 1;
 					}
 				});
 				//Статья
 				article.vote = 0;
 				var art_voters = JSON.parse(article.voters);
-				if(art_voters.indexOf(req.user.id) == -1) {
+				if(article.author == req.user.id) {
+					article.vote = 2;
+				}
+				else if(art_voters.indexOf(req.user.id) == -1) {
 					article.vote = 1;
 				}
 				//Рендер

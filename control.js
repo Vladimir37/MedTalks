@@ -597,7 +597,35 @@ function pass(req, res) {
 	}
 	//Изменение
 	else if(act_type == 2) {
-		//
+		var old_pass = req.body.old_pass;
+		var new_pass = req.body.new_pass;
+		var new_pass_double = req.body.new_pass_double;
+		if(new_pass == new_pass_double) {
+			db.tables.users.findOne({where: {
+				mail: act_mail
+			}}).then(function(user) {
+				if(user) {
+					var current_pass = crypt_pass.decrypt(user.pass);
+					if(current_pass == old_pass) {
+						var entered_pass = crypt_pass.encrypt(new_pass);
+						user.pass = entered_pass;
+						user.save();
+						render.jade(res, 'success/change');
+					}
+					else {
+						render.jade(res, 'errors/ePass');
+					}
+				}
+				else {
+					render.jade(res, 'errors/ePass');
+				}
+			}, function(err) {
+				render.server(res);
+			})
+		}
+		else {
+			render.jade(res, 'errors/ePassDouble');
+		}
 	}
 	//Ошибка: операция без типа
 	else {
