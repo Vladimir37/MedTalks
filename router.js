@@ -102,7 +102,7 @@ app.get('/sandbox/:num', function(req, res) {
 	}
 });
 //Личная лента юзера
-app.get('/roll', function (req, user) {
+app.get('/roll', function(req, res) {
 	if(req.user) {
 		pages.list(req, res, {type: 6, page: 0});
 	}
@@ -110,7 +110,7 @@ app.get('/roll', function (req, user) {
 		render.error(res);
 	}
 });
-app.get('/roll/:num', function (req, user) {
+app.get('/roll/:num', function(req, res) {
 	if(req.user) {
 		var page_num = req.params.num;
 		pages.list(req, res, {type: 6, page: page_num});

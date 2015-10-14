@@ -10,11 +10,11 @@ block content
 		a(href="/article/" + item.id)
 			input(type="button" value="Читать полностью")
 		br
-	- if(data2.current != 0)
-		- var prev = +data2.current - 1
-		a(href="/roll/" + data1.addr + '/' + prev)
+	- if(data1.current != 0)
+		- var prev = +data1.current - 1
+		a(href="/roll/" + prev)
 			input(type="button" value="Предыдущая")
-	- if(data2.current != data2.total)
-		- var next = +data2.current + 1
-		a(href="/roll/" + data1.addr + '/' + next)
+	- if(data1.current != data1.total)
+		- var next = +data1.current + 1
+		a(href="/roll/" + next)
 			input(type="button" value="Следующая")

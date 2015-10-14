@@ -225,7 +225,57 @@ function list(req, res, params) {
 	}
 	//Личная лента
 	else if(params.type == 6) {
-		
+		//Парсинг JSON
+		var s_hubs = JSON.parse(req.user.profile.sub_hubs);
+		var s_users = JSON.parse(req.user.profile.sub_users);
+		var s_tags = JSON.parse(req.user.profile.sub_tags);
+		//Получение номеров хабов
+		db.tables.hubs.findAll({where: {
+			name: {
+				$in: s_hubs
+			}
+		}}).then(function(hubs_num) {
+			var n_hubs = db.select(hubs_num, 'id');
+			//Получение номеров юзеров
+			db.tables.users.findAll({where: {
+				name: {
+					$in: s_users
+				}
+			}}).then(function(users_num) {
+				var n_users = db.select(users_num, 'id');
+				//Создание объекта для поиска по тегам
+				var n_tags = [];
+				s_tags.forEach(function(item) {
+					n_tags.push({tags: {
+						$like: '%' + item + '%'
+					}});
+				});
+				n_tags.push({hubId: {
+						$in: n_hubs
+					}},
+				{author: {
+						$in: n_users
+					}});
+				//Поиск и рендер
+				db.tables.articles.findAndCountAll({
+					where: {
+						$or: n_tags
+					},
+					offset: start_article,
+					limit: 10,
+					order: [['updatedAt', 'DESC']],
+					include: [{model: db.tables.hubs}, {model: db.tables.users}]
+				}).then(function(articles) {
+					//Данные страниц
+					var page_data = {
+						current: params.page,
+						total: Math.floor(articles.count / 10)
+					};
+					render.jade(res, 'roll_list', articles.rows, page_data, req.user);
+					res.end('Win');
+				});
+			});
+		});
 	}
 	//Ошибка: Список без типа
 	else {
