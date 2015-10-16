@@ -7,4 +7,7 @@ html(lang="ru")
 		script(src="/source/js/main.js")
 		include mixins
 	body
+		form(action="/search" method="post")
+			input(type="text" name="search" placeholder="Поиск")
+			input(type="submit" value="Поиск")
 		block content

@@ -279,7 +279,8 @@ function draftAction(req, res, user) {
 };
 
 //Сохранение редактирования
-function editingDraft(req, res, num) {
+function editingDraft(req, res) {
+	var num = req.user.id;
 	var form = new formidable.IncomingForm({
 		encoding: 'utf-8', 
 		uploadDir: 'temp', 

@@ -277,6 +277,7 @@ function list(req, res, params) {
 						current: params.page,
 						total: Math.floor(articles.count / 10)
 					};
+					articles.rows = assist.imagesArr(articles.rows);
 					render.jade(res, 'roll_list', articles.rows, page_data, req.user);
 					res.end('Win');
 				});
@@ -326,6 +327,31 @@ function sandbox(req, res) {
 	});
 };
 
+//Поиск
+function search(req, res) {
+	var query = '%' + req.body.search + '%';
+	db.tables.articles.findAll({where: {
+		$or: [
+			{title: {
+				$like: query
+			}},
+			{text: {
+				$like: query
+			}},
+			{tags: {
+				$like: query
+			}}
+		]
+	}, 
+	order: [['updatedAt', 'DESC']],
+	include: [{model: db.tables.hubs}, {model: db.tables.users}]
+	}).then(function(result) {
+		render.jade(res, 'search', result);
+	}, function (err) {
+		serverError(err, res);
+	})
+};
+
 //Рендер ошибки и сообщение в консоль
 function serverError(err, res) {
 	console.log(err);
@@ -338,3 +364,4 @@ exports.draft_article = draft_article;
 exports.list = list;
 exports.user = user;
 exports.sandbox = sandbox;
+exports.search = search;

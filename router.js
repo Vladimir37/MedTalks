@@ -7,10 +7,12 @@ var pages = require('./assist/pages');
 var control = require('./control');
 var authent = require('./assist/authent');
 var checking = require('./assist/checking');
+var favicon = require('serve-favicon');
 
 var app = express();
 app.use(parser());
 app.use(cookie());
+app.use(favicon('front/source/other/favicon.ico'));
 
 //Проверка авторизации при загрузке
 app.use(function (req, res, next) {
@@ -205,8 +207,7 @@ app.post('/create_article', function(req, res) {
 //Операции с черновой статьёй
 app.post('/draft/:name', function(req, res) {
 	if(req.user) {
-		//ПЕРЕДЕЛАТЬ
-		control.draft(req, res, req.user.id);
+		control.draft(req, res);
 	}
 	else {
 		render.error(res);
@@ -252,6 +253,10 @@ app.post('/sandbox_item/:name', function(req, res) {
 app.post('/pass', function(req, res) {
 	control.pass(req, res);
 });
+//Поиск
+app.post('/search', function(req, res) {
+	pages.search(req, res);
+});
 //Подписки -----------------------------------
 //Подписка и отписка на юзера
 app.post('/user/:name', function(req, res) {
@@ -280,6 +285,7 @@ app.post('/hub/:name', function(req, res) {
 		render.error(res);
 	}
 });
+//Бан
 app.post('/ban/:name', function(req, res) {
 	if(req.user && req.user.status >= 3) {
 		control.ban(req, res);

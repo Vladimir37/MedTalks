@@ -9,15 +9,17 @@ function renderJade(res, name) {
 	for(var i = 0; i < arguments.length - 2; i++) {
 		jade_data['data' + i] = arguments[i + 2];
 	};
-	jade.renderFile('front/pages/' + name + '.jade', jade_data, function(err, result) {
-		if(err) {
-			console.log(err);
-			renderError(res);
-		}
-		else {
-			res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'})
-			res.end(result);
-		}
+	db.tables.users.findOne().then(function(user) {
+		jade.renderFile('front/pages/' + name + '.jade', jade_data, function(err, result) {
+			if(err) {
+				console.log(err);
+				renderError(res);
+			}
+			else {
+				res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'});
+				res.end(result);
+			}
+		});
 	});
 };
 
