@@ -29,24 +29,26 @@ function article(req, res) {
 			}).then(function(comments) {
 				//Проверка на возможность голосовать
 				//Комменты
-				comments.forEach(function(item) {
-					item.vote = 0;
-					var com_voters = JSON.parse(item.voters);
-					if(item.author == req.user.id) {
-						item.vote = 2;
+				if(req.user) {
+					comments.forEach(function(item) {
+						item.vote = 0;
+						var com_voters = JSON.parse(item.voters);
+						if(item.author == req.user.id) {
+							item.vote = 2;
+						}
+						else if(com_voters.indexOf(req.user.id) == -1) {
+							item.vote = 1;
+						}
+					});
+					//Статья
+					article.vote = 0;
+					var art_voters = JSON.parse(article.voters);
+					if(article.author == req.user.id) {
+						article.vote = 2;
 					}
-					else if(com_voters.indexOf(req.user.id) == -1) {
-						item.vote = 1;
+					else if(art_voters.indexOf(req.user.id) == -1) {
+						article.vote = 1;
 					}
-				});
-				//Статья
-				article.vote = 0;
-				var art_voters = JSON.parse(article.voters);
-				if(article.author == req.user.id) {
-					article.vote = 2;
-				}
-				else if(art_voters.indexOf(req.user.id) == -1) {
-					article.vote = 1;
 				}
 				//Рендер
 				render.jade(res, 'article', article, comments, req.user);
@@ -279,7 +281,6 @@ function list(req, res, params) {
 					};
 					articles.rows = assist.imagesArr(articles.rows);
 					render.jade(res, 'roll_list', articles.rows, page_data, req.user);
-					res.end('Win');
 				});
 			});
 		});
@@ -330,26 +331,31 @@ function sandbox(req, res) {
 //Поиск
 function search(req, res) {
 	var query = '%' + req.body.search + '%';
-	db.tables.articles.findAll({where: {
-		$or: [
-			{title: {
-				$like: query
-			}},
-			{text: {
-				$like: query
-			}},
-			{tags: {
-				$like: query
-			}}
-		]
-	}, 
-	order: [['updatedAt', 'DESC']],
-	include: [{model: db.tables.hubs}, {model: db.tables.users}]
-	}).then(function(result) {
-		render.jade(res, 'search', result);
-	}, function (err) {
-		serverError(err, res);
-	})
+	if(query.length < 30) {
+		db.tables.articles.findAll({where: {
+			$or: [
+				{title: {
+					$like: query
+				}},
+				{text: {
+					$like: query
+				}},
+				{tags: {
+					$like: query
+				}}
+			]
+		}, 
+		order: [['updatedAt', 'DESC']],
+		include: [{model: db.tables.hubs}, {model: db.tables.users}]
+		}).then(function(result) {
+			render.jade(res, 'search', result);
+		}, function (err) {
+			serverError(err, res);
+		});
+	}
+	else {
+		render.jade(res, 'errors/eSearch');
+	}
 };
 
 //Рендер ошибки и сообщение в консоль

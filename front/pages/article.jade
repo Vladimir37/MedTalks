@@ -4,10 +4,11 @@ block content
 	mixin article_full(data0, data2)
 	- each item, i in data1
 		mixin comment(item, data2)
-	article.comment_create
-		form(action="/comment/" + data0.id method="post")
-			input(type="hidden" name="answer" value=null)
-			br
-			textarea(name="text")
-			br
-			input(type="submit" value="Отправить")
+	- if(data2)
+		article.comment_create
+			form(action="/comment/" + data0.id method="post")
+				input(type="hidden" name="answer" value=null)
+				br
+				textarea(name="text")
+				br
+				input(type="submit" value="Отправить")
