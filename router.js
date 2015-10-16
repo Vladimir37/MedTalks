@@ -294,6 +294,15 @@ app.post('/ban/:name', function(req, res) {
 		render.error(res);
 	}
 });
+//Отправка статьи на переработку
+app.post('/article/:name', function(req, res) {
+	if(req.user && req.user.status >= 3) {
+		control.recicle(req, res);
+	}
+	else {
+		render.error(res);
+	}
+});
 
 //Служебные ---------------------------------------------
 

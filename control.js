@@ -634,6 +634,28 @@ function pass(req, res) {
 	}
 };
 
+//Отправка статьи на переработку
+function recicle(req, res) {
+	var num = req.params.name;
+	var reason = req.body.reason;
+	db.tables.articles.findById(num).then(function(article) {
+		article.status = 0;
+		article.save();
+		db.tables.users.findById(article.author).then(function(user) {
+			user.decrement('articles_count', {by: 1});
+			var letter_obj = {
+				name: user.name,
+				article: article.title,
+				reason: reason
+			};
+			mail(user.mail, 'Статья отправлена на переработку', 'refuse', letter_obj);
+			render.jade(res, 'success/recicle');
+		});
+	}, function(err) {
+		render.server(res);
+	});
+};
+
 exports.registration = registration;
 exports.confirm = confirm;
 exports.auth = auth;
@@ -647,3 +669,4 @@ exports.rating = rating;
 exports.sandbox = sandbox;
 exports.ban = ban;
 exports.pass = pass;
+exports.recicle = recicle;

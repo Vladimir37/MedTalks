@@ -12,3 +12,9 @@ block content
 				textarea(name="text")
 				br
 				input(type="submit" value="Отправить")
+		- if(data2.status >= 3)
+			form(method="post")
+				h2 Отправить на переработку
+				textarea(name="reason" placeholder="Причины" required)
+				br
+				input(type="submit" value="Отправить")
