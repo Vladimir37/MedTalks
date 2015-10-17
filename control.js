@@ -240,7 +240,11 @@ function draftAction(req, res, user) {
 				switch(req.body.type) {
 					case '1':
 						//Публикация
-						db.tables.articles.update({status: article_status}, {where: {id: num}}).then(function() {
+						db.tables.articles.update({
+							status: article_status
+						}, {
+							where: {id: num}
+						}).then(function() {
 							render.jade(res, 'success/article');
 						}, function(err) {
 							console.log(err);
@@ -656,6 +660,42 @@ function recicle(req, res) {
 	});
 };
 
+//Теги в списке hubs
+function hubs(req, res) {
+	var act_type = req.body.type;
+	var act_hub = req.body.hub;
+	var act_tag = req.body.tag;
+	fs.readFile('configs/hubs_tags.json', function(err, result) {
+		if(err) {
+			render.server(res);
+		}
+		else {
+			var hubs_tags = JSON.parse(result);
+			//Удаление тега
+			if(act_type == 0) {
+				var tag_num = hubs_tags[act_hub].indexOf(act_tag);
+				hubs_tags[act_hub].splice(tag_num, 1);
+			}
+			//Добавление нового
+			else if(act_type == 1) {
+				if(!hubs_tags[act_hub]) {
+					hubs_tags[act_hub] = [];
+				}
+				hubs_tags[act_hub].push(act_tag);
+			}
+			//Запись изменений
+			fs.open('configs/hubs_tags.json', 'w', function(err, descriptor) {
+				if(err) {
+					render.server(res);
+				}
+				else {
+					//
+				}
+			})
+		}
+	})
+};
+
 exports.registration = registration;
 exports.confirm = confirm;
 exports.auth = auth;
@@ -670,3 +710,4 @@ exports.sandbox = sandbox;
 exports.ban = ban;
 exports.pass = pass;
 exports.recicle = recicle;
+exports.hubs = hubs;

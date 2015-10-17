@@ -39,6 +39,10 @@ app.get('/registration', function(req, res) {
 app.get('/login', function(req, res) {
 	render.jade(res, 'login');
 });
+//Список хабов с тегами
+app.get('/hubs', function(req, res) {
+	pages.hubs(req, res);
+});
 //Напомнить пароль
 app.get('/pass', function(req, res) {
 	render.jade(res, 'pass_remind');
@@ -244,6 +248,15 @@ app.post('/rating/:type/:num', function(req, res) {
 app.post('/sandbox_item/:name', function(req, res) {
 	if(req.user && req.user.status >= 3) {
 		control.sandbox(req, res);
+	}
+	else {
+		render.error(res);
+	}
+});
+//Операции с тегами в hubs
+app.post('/hubs', function(req, res) {
+	if(req.user && req.user.status >= 3) {
+		control.hubs(req, res);
 	}
 	else {
 		render.error(res);

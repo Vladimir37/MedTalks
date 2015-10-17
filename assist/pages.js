@@ -1,5 +1,7 @@
+var fs = require('fs');
+
 var db = require('./database');
-var render = require('./../render');
+var render = require('../render');
 var checking = require('./checking');
 var assist = require('./assist');
 
@@ -358,6 +360,23 @@ function search(req, res) {
 	}
 };
 
+//Список хабов с тегами
+function hubs(req, res) {
+	db.tables.hubs.findAll().then(function(hubs_list) {
+		fs.readFile('configs/hubs_tags.json', function(err, result) {
+			if(err) {
+				render.server(res);
+			}
+			else {
+				var hubs_tags = JSON.parse(result);
+				render.jade(res, 'hubs', hubs_list, hubs_tags, req.user);
+			}
+		});
+	}, function(err) {
+		serverError(err, res);
+	});
+};
+
 //Рендер ошибки и сообщение в консоль
 function serverError(err, res) {
 	console.log(err);
@@ -371,3 +390,4 @@ exports.list = list;
 exports.user = user;
 exports.sandbox = sandbox;
 exports.search = search;
+exports.hubs = hubs;
