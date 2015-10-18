@@ -1,6 +1,9 @@
-h1 Уважаемый #{name}!
-p Ваша статья #{article} была отправлена на переработку по следующей причине:
-p=reason
-p Вы можете найти её у себя в черновике (
-	a(href="http://localhost/draft") http://localhost/draft
-	| )
+extends layout
+
+block content
+	h1 Уважаемый #{name}!
+	p Ваша статья #{article} была отправлена на переработку по следующей причине:
+	p=reason
+	p Вы можете найти её у себя в черновике (
+		a(href="http://localhost/draft") http://localhost/draft
+		| )

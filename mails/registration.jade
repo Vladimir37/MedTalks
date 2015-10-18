@@ -1,3 +1,6 @@
-h1 Добро пожаловать, #{name}!
-p Вы зарегистрированы. Перейдите по этой ссылке для подтверждения регистрации: 
-a(href="http://localhost:3000/confirm/" + key) http://localhost:3000/confirm/#{key}
+extends layout
+
+block content
+	h1 Добро пожаловать, #{name}!
+	p Вы зарегистрированы. Перейдите по этой ссылке для подтверждения регистрации: 
+	a(href="http://localhost:3000/confirm/" + key) http://localhost:3000/confirm/#{key}

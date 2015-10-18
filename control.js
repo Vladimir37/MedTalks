@@ -699,6 +699,29 @@ function hubs(req, res) {
 	});
 };
 
+//Повышение до админа и обратно
+function raise(req, res) {
+	var user_id = req.params.name;
+	db.tables.users.findById(user_id).then(function(user) {
+		//Повышение
+		if(user.status == 2) {
+			user.increment('status', {by: 1});
+			render.jade(res, 'success/status');
+		}
+		//Понижение
+		else if(user.status == 3) {
+			user.decrement('status', {by: 1});
+			render.jade(res, 'success/status');
+		}
+		//Ошибка: неверный статус
+		else {
+			render.error(res);
+		}
+	}, function(err) {
+		render.server(res);
+	})
+};
+
 exports.registration = registration;
 exports.confirm = confirm;
 exports.auth = auth;
@@ -714,3 +737,4 @@ exports.ban = ban;
 exports.pass = pass;
 exports.recicle = recicle;
 exports.hubs = hubs;
+exports.raise = raise;

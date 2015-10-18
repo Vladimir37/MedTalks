@@ -316,6 +316,19 @@ app.post('/article/:name', function(req, res) {
 		render.error(res);
 	}
 });
+//Повышение до админа и обратно
+app.post('/raise/:name', function(req, res) {
+	if(req.user && req.user.status == 4) {
+		control.raise(req, res);
+	}
+	else {
+		render.error(res);
+	}
+});
+//AJAX проверка имени и почты
+app.post('/ajax', function(req, res) {
+	checking.ajax(req);
+});
 
 //Служебные ---------------------------------------------
 

@@ -33,6 +33,12 @@ block content
 				input(type="submit" value="Подписаться")
 			- else
 				input(type="submit" value="Отписаться")
-		- if(data1.status >= 3 && data0.ban == 0)
+		- if(data0.status < 3 && data1.status >= 3 && data0.ban == 0)
 			form(action="/ban/" + data0.id method="post")
 				input(type="submit" value="Забанить")
+		- if(data0.status == 2 && data1.status == 4)
+			form(action="/raise/" + data0.id method="post")
+				input(type="submit" value="Сделать админом")
+		- if(data0.status == 3 && data1.status == 4)
+			form(action="/raise/" + data0.id method="post")
+				input(type="submit" value="Лишить админки")
