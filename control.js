@@ -689,11 +689,14 @@ function hubs(req, res) {
 					render.server(res);
 				}
 				else {
-					//
+					var tags_json = JSON.stringify(hubs_tags);
+					fs.write(descriptor, tags_json, function(err) {
+						render.jade(res, 'success/tag');
+					});
 				}
-			})
+			});
 		}
-	})
+	});
 };
 
 exports.registration = registration;
