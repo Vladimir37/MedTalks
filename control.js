@@ -722,6 +722,14 @@ function raise(req, res) {
 	})
 };
 
+//Выход из страницы
+function exit(req, res) {
+	if(req.cookies.mt_login) {
+		res.clearCookie('mt_login');
+	}
+	res.redirect('/');
+}
+
 exports.registration = registration;
 exports.confirm = confirm;
 exports.auth = auth;
@@ -738,3 +746,4 @@ exports.pass = pass;
 exports.recicle = recicle;
 exports.hubs = hubs;
 exports.raise = raise;
+exports.exit = exit;

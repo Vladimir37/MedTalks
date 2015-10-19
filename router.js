@@ -179,6 +179,10 @@ app.get('/create_hub', function(req, res) {
 		render.error(res);
 	}
 });
+//Выход
+app.get('/exit', function(req, res) {
+	control.exit(req, res);
+});
 
 //POST-запросы ---------------------------------------------
 
