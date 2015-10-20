@@ -9,6 +9,7 @@ function renderJade(res, name) {
 	for(var i = 0; i < arguments.length - 2; i++) {
 		jade_data['data' + i] = arguments[i + 2];
 	};
+	jade_data.auth = res.auth;
 	db.tables.users.findOne().then(function(user) {
 		jade.renderFile('front/pages/' + name + '.jade', jade_data, function(err, result) {
 			if(err) {

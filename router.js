@@ -18,6 +18,7 @@ app.use(favicon('front/source/other/favicon.ico'));
 app.use(function (req, res, next) {
 	authent(req).then(function (user){
 		req.user = user;
+		res.auth = true;
 		next();
 	}, function() {
 		next();
@@ -28,8 +29,7 @@ app.use(function (req, res, next) {
 
 //Главная ---------------------------------------------
 app.get('/', function(req, res) {
-	console.log(req.user);
-	res.end('END');
+	pages.list(req, res, {type: 7, page: 0});
 });
 //Регистрация
 app.get('/registration', function(req, res) {
@@ -137,6 +137,11 @@ app.get('/roll/:num', function(req, res) {
 	else {
 		render.error(res);
 	}
+});
+//Лента всех статей
+app.get('/page/:num', function(req, res) {
+	var page_num = req.params.num;
+	pages.list(req, res, {type: 7, page: page_num});
 });
 //Статья в песочнице
 app.get('/sandbox_item/:name', function(req, res) {

@@ -283,8 +283,36 @@ function list(req, res, params) {
 					};
 					articles.rows = assist.imagesArr(articles.rows);
 					render.jade(res, 'roll_list', articles.rows, page_data, req.user);
+				}, function(err) {
+					serverError(err, res);
 				});
 			});
+		});
+	}
+	//Все статьи
+	else if(params.type == 7) {
+		db.tables.articles.findAndCountAll({
+			where: {
+				status: 2
+			},
+			offset: start_article,
+			limit: 10,
+			order: [['updatedAt', 'DESC']],
+			include: [{model: db.tables.hubs}, {model: db.tables.users}]
+		}).then(function(articles) {
+			if(articles.rows) {
+				var page_data = {
+					current: params.page,
+					total: Math.floor(articles.count / 10)
+				};
+				articles.rows = assist.imagesArr(articles.rows);
+				render.jade(res, 'main_list', articles.rows, page_data, req.user);
+			}
+			else {
+				render.error(res);
+			}
+		}, function(err) {
+			serverError(err, res);
 		});
 	}
 	//Ошибка: Список без типа

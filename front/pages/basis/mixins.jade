@@ -53,6 +53,17 @@ mixin article_short(article)
 		a(href="/article/" + article.id)
 			input(type="button" value="Читать полностью")
 		br
+//- Краткая статья в песочнице
+mixin article_short_sandbox(article)
+	-if(article.text.length > 512)
+		- article.text = article.text.substr(0, 512) + '...'
+	h2=article.title
+		p Тэги - #{article.tags}
+		h3 Автор #{article.user.name}
+		p!=article.text
+		a(href="/sandbox_item/" + article.id)
+			input(type="button" value="Читать полностью")
+		br
 //- Комментарий
 mixin comment(comment, user_data)
 	h4=comment.user.name

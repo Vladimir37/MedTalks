@@ -10,4 +10,10 @@ html(lang="ru")
 		form(action="/search" method="post")
 			input(type="text" name="search" placeholder="Поиск")
 			input(type="submit" value="Поиск")
+		- if(auth)
+			a(href="/profile") Профиль
+			a(href="/exit") Выход
+		- else
+			a(href="/login") Вход
+			a(href="/registration") Регистрация
 		block content
