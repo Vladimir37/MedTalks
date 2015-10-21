@@ -118,7 +118,7 @@ function list(req, res, params) {
 							total: Math.floor(articles.count / 10)
 						}
 						articles.rows = assist.imagesArr(articles.rows);
-						render.jade(res, 'hub_list', articles.rows, hub, page_data, req.user);
+						render.jade(res, 'lists/hub_list', articles.rows, hub, page_data, req.user);
 					}
 					else {
 						render.error(res);
@@ -151,7 +151,7 @@ function list(req, res, params) {
 							total: Math.floor(articles.count / 10)
 						}
 						articles.rows = assist.imagesArr(articles.rows);
-						render.jade(res, 'author_list', articles.rows, user, page_data, req.user);
+						render.jade(res, 'lists/author_list', articles.rows, user, page_data, req.user);
 					}
 					else {
 						render.error(res);
@@ -186,7 +186,7 @@ function list(req, res, params) {
 					total: Math.floor(articles.count / 10)
 				};
 				articles.rows = assist.imagesArr(articles.rows);
-				render.jade(res, 'tag_list', articles.rows, target_name, page_data, req.user);
+				render.jade(res, 'lists/tag_list', articles.rows, target_name, page_data, req.user);
 			}
 			else {
 				render.error(res);
@@ -202,7 +202,7 @@ function list(req, res, params) {
 			status: 0
 		}}).then(function(result) {
 			//Полученные статьи в черновике
-			render.jade(res, 'draft', result);
+			render.jade(res, 'lists/draft', result);
 		}, function(err) {
 			serverError(err, res);
 		});
@@ -224,7 +224,7 @@ function list(req, res, params) {
 					total: Math.floor(articles.count / 10)
 				};
 				articles.rows = assist.imagesArr(articles.rows);
-				render.jade(res, 'sandbox_list', articles.rows, target_name, page_data, req.user);
+				render.jade(res, 'lists/sandbox_list', articles.rows, target_name, page_data, req.user);
 			}
 			else {
 				render.error(res);
@@ -282,7 +282,7 @@ function list(req, res, params) {
 						total: Math.floor(articles.count / 10)
 					};
 					articles.rows = assist.imagesArr(articles.rows);
-					render.jade(res, 'roll_list', articles.rows, page_data, req.user);
+					render.jade(res, 'lists/roll_list', articles.rows, page_data, req.user);
 				}, function(err) {
 					serverError(err, res);
 				});
@@ -306,7 +306,7 @@ function list(req, res, params) {
 					total: Math.floor(articles.count / 10)
 				};
 				articles.rows = assist.imagesArr(articles.rows);
-				render.jade(res, 'main_list', articles.rows, page_data, req.user);
+				render.jade(res, 'lists/main_list', articles.rows, page_data, req.user);
 			}
 			else {
 				render.error(res);

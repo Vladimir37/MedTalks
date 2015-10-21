@@ -1,16 +1,20 @@
-extends basis/layout
+extends ../basis/layout
 
 block content
 	h1 Тег «#{data1}»
+	//- Только авторизированным
 	- if(data3)
 		form(action="/tag/" + data1 method="post")
+			//- Проверка подписанности
 			- var sub_tags = JSON.parse(data3.profile.sub_tags)
 			- if(sub_tags.indexOf(data1) == -1)
 				input(type="submit" value="Подписаться")
 			- else
 				input(type="submit" value="Отписаться")
+	//- Перебор и рендер статей
 	- each item in data0
 		mixin article_short(item)
+	//- Постраничная навигация
 	- if(data2.current != 0)
 		- var prev = +data2.current - 1
 		a(href="/tag/" + data1 + '/' + prev)

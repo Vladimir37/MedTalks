@@ -7,12 +7,14 @@ block content
 		br
 		textarea(name="text" placeholder="Текст статьи" id="article_text" required)
 		br
+		//- Вывод списка хабов
 		select(name="hub")
 			- for(var i = 0; i < data0.length; i++)
 				option(value=data0[i].id)=data0[i].name
 		br
 		input(type="text" name="tags" placeholder="Теги через запятую" required)
 		br
+		//- Загрузка файлов (новые поля создаются на js)
 		article.files
 			input(type="file" name="f0" class="image_load" data-load="true")
 			br
