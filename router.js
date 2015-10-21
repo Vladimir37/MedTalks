@@ -335,7 +335,7 @@ app.post('/raise/:name', function(req, res) {
 	}
 });
 //AJAX проверка имени и почты
-app.post('/ajax', function(req, res) {
+app.post('/check', function(req, res) {
 	checking.ajax(req);
 });
 
