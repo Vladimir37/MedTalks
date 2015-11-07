@@ -1,0 +1,15 @@
+extends basis/layout
+
+block content
+	h1 Изменить текущий пароль
+	form(action="/pass" method="post")
+		input(type="hidden" name="type" value="2")
+		input(type="text" name="mail" placeholder="Ваша почта")
+		br
+		input(type="text" name="old_pass" placeholder="Старый пароль")
+		br
+		input(type="text" name="new_pass" placeholder="Новый пароль")
+		br
+		input(type="text" name="new_pass_double" placeholder="Подтвердите новый пароль")
+		br
+		input(type="submit" value="Изменить")

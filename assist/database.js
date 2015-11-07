@@ -40,6 +40,14 @@ tables.users = sequelize.define('users', {
 		type: Sequelize.INTEGER,
 		defaultValue: 0
 	},
+	articles_count: {
+		type: Sequelize.INTEGER,
+		defaultValue: 0
+	},
+	comments_count: {
+		type: Sequelize.INTEGER,
+		defaultValue: 0
+	},
 	ban: {
 		type: Sequelize.INTEGER,
 		defaultValue: 0
@@ -62,6 +70,7 @@ tables.articles = sequelize.define('articles', {
 		type: Sequelize.INTEGER,
 		defaultValue: 0
 	},
+	voters: Sequelize.TEXT,
 	images: {
 		type: Sequelize.INTEGER,
 		defaultValue: 0
@@ -80,7 +89,8 @@ tables.comments = sequelize.define('comments', {
 	rating: {
 		type: Sequelize.INTEGER,
 		defaultValue: 0
-	}
+	},
+	voters: Sequelize.TEXT
 });
 
 tables.hubs = sequelize.define('hubs', {
@@ -99,7 +109,6 @@ tables.profiles = sequelize.define('profiles', {
 		primaryKey: true,
 		autoIncrement: true
 	},
-	public_name: Sequelize.TEXT,
 	place: Sequelize.TEXT,
 	contact_type: Sequelize.INTEGER,
 	contact_address: Sequelize.TEXT,
@@ -116,6 +125,8 @@ tables.comments.belongsTo(tables.users, {foreignKey: 'author'});
 tables.articles.belongsTo(tables.users, {foreignKey: 'author'});
 //Хабы статей
 tables.articles.belongsTo(tables.hubs, {foreignKey: 'hubId'});
+//Профили с юзерами
+tables.users.hasOne(tables.profiles, {foreignKey: 'id'});
 
 //Синхронизация и создание всех таблиц
 for(table in tables) {

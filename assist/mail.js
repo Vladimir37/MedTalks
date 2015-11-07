@@ -1,4 +1,5 @@
 var nodemailer = require('nodemailer');
+var jade = require('jade');
 
 var config = require('../configs/mail_data');
 
@@ -31,4 +32,16 @@ function send(address, subject, text) {
     });
 };
 
-exports.send = send;
+function template(address, subject, name, obj) {
+	console.log()
+	jade.renderFile('mails/' + name + '.jade', obj, function(err, result) {
+		if(err) {
+			console.log(err);
+		}
+		else {
+			send(address, subject, result);
+		}
+	});
+};
+
+module.exports = template;

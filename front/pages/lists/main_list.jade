@@ -1,0 +1,15 @@
+extends ../basis/layout
+
+block content
+	//- Перебор и рендер статей
+	- each item in data0
+		mixin article_short(item)
+	//- Постраничная навигация
+	- if(data1.current != 0)
+		- var prev = +data1.current - 1
+		a(href="/page/" + prev)
+			input(type="button" value="Предыдущая")
+	- if(data1.current != data1.total)
+		- var next = +data1.current + 1
+		a(href="/page/" + next)
+			input(type="button" value="Следующая")

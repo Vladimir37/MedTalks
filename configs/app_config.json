@@ -2,5 +2,6 @@
 	"port": 3000,
 	"encrypt_key": "secret_key_for_medtalks",
 	"auth_key": "key_for_auth",
-	"restrictions_users": false
+	"restrictions_users": false,
+	"articles_for_confirm": 3
 }

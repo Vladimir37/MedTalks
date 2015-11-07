@@ -113,7 +113,31 @@ function user_id(req) {
 	});
 };
 
+//AJAX проверка имени и почты
+function ajax(req) {
+	var type = req.body.type;
+	var data = req.body.data;
+	if(type == 'mail') {
+		mail_check(data).then(function() {
+			return 'Free';
+		}, function() {
+			return 'Not free';
+		});
+	}
+	else if(type == 'name') {
+		name_check(data).then(function() {
+			return 'Free';
+		}, function() {
+			return 'Not free';
+		});
+	}
+	else {
+		return 'Not free';
+	}
+};
+
 exports.fullCheck = all_check;
 exports.confirm = confirm;
 exports.file = fileType;
 exports.user = user_id;
+exports.ajax = ajax;

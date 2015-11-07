@@ -1,14 +1,24 @@
 extends basis/layout
 
 block content
-	mixin article_full(data0)
+	//- Рендер статьи
+	mixin article_full(data0, data2)
+	//- Перебор и рендер комментов
 	- each item, i in data1
-		b=item.user.name
-		p=item.text
-	article.comment_create
-		form(action="/comment/" + data0.id method="post")
-			input(type="hidden" name="answer" value=null)
-			br
-			textarea(name="text")
-			br
-			input(type="submit" value="Отправить")
+		mixin comment(item, data2)
+	//- Авторизированным - возможность комментировать
+	- if(data2)
+		article.comment_create
+			form(action="/comment/" + data0.id method="post")
+				input(type="hidden" name="answer" value=null)
+				br
+				textarea(name="text")
+				br
+				input(type="submit" value="Отправить")
+		//- Админам - возможность отправлять в черновик
+		- if(data2.status >= 3)
+			form(method="post")
+				h2 Отправить на переработку
+				textarea(name="reason" placeholder="Причины" required)
+				br
+				input(type="submit" value="Отправить")

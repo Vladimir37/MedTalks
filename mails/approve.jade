@@ -1,0 +1,6 @@
+extends layout
+
+block content
+	h1 Уважаемый #{name}!
+	p Ваша статья #{article} прошла проверку и была опубликована! Вы можете найти её по ссылке 
+		a(href="http://localhost/article/" + num) http://localhost/article/#{num}

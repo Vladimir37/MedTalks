@@ -1,0 +1,27 @@
+extends basis/layout
+
+block content
+	h1 Список хабов
+	- each hub, i in data0
+		h3=hub.name
+		//- Только админам
+		- if(data2 && data2.status >= 3)
+			form(method="post")
+				h4 Добавить тег к хабу #{hub.name}
+				input(type="hidden" name="type" value="1")
+				input(type="hidden" name="hub" value=hub.name)
+				input(type="text" name="tag" required)
+				input(type="submit" value="Добавить")
+		//- Список тегов в хабе
+		- if(data1[hub.name])
+			- each tag, i in data1[hub.name]
+				a(href="/tag/" + tag)=tag + ' '
+				- if(data2 && data2.status >= 3)
+					form(method="post")
+						input(type="hidden" name="type" value="0")
+						input(type="hidden" name="hub" value=hub.name)
+						input(type="hidden" name="tag" value=tag)
+						input(type="submit" value="Удалить")
+	//- Ссылка для админов
+	- if(data2 && data2.status == 4)
+		a(href="/create_hub") Создать хаб

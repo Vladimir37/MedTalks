@@ -5,6 +5,39 @@ html(lang="ru")
 		title MedTalks
 		script(src="/source/js/jquery.js")
 		script(src="/source/js/main.js")
+		//- Подключение миксинов
 		include mixins
 	body
+		//- Поиск
+		form(action="/search" method="post")
+			input(type="text" name="search" placeholder="Поиск")
+			input(type="submit" value="Поиск")
+		//- Кнопки
+		- if(auth)
+			a(href="/profile") Профиль
+			a(href="/exit") Выход
+		- else
+			a(href="/login") Вход
+			a(href="/registration") Регистрация
+		//- Свежие статьи
+		article.news
+			h3 Последние статьи
+			- each item, i in news
+				p #{item.title} (#{item.rating})
+		//- Свежие комментарии
+		article.comments
+			h3 Последние комментарии
+			- each item, i in comments
+				p
+					//- Проверка на наличие аватара
+					- var avatar;
+					- if(item.user.avatar == 0)
+						- avatar = 'default'
+					- else 
+						- avatar = item.user.id
+					img(src="/source/avatars/" + avatar + ".png" alt="avatar" style="width: 50px")
+					//- Имя юзера
+					b=item.user.name
+				//- Текст комента
+				p=item.text
 		block content

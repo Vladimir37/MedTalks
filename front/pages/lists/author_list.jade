@@ -1,15 +1,11 @@
-extends basis/layout
+extends ../basis/layout
 
 block content
 	h1 Статьи #{data1.name}
+	//- Перебор и рендер статей
 	- each item in data0
-		h2=item.title
-		p Тэги - #{item.tags}
-		h3 Автор #{item.user.name}
-		p!=item.text
-		a(href="/article/" + item.id)
-			input(type="button" value="Читать полностью")
-		br
+		mixin article_short(item)
+	//- Постраничная навигация
 	- if(data2.current != 0)
 		- var prev = +data2.current - 1
 		a(href="/author/" + data1.name + '/' + prev)

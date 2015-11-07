@@ -7,20 +7,29 @@ var pages = require('./assist/pages');
 var control = require('./control');
 var authent = require('./assist/authent');
 var checking = require('./assist/checking');
+var favicon = require('serve-favicon');
 
 var app = express();
 app.use(parser());
 app.use(cookie());
+app.use(favicon('front/source/other/favicon.ico'));
+
+//Проверка авторизации при загрузке
+app.use(function (req, res, next) {
+	authent(req).then(function (user){
+		req.user = user;
+		res.auth = true;
+		next();
+	}, function() {
+		next();
+	});
+});
 
 //GET-запросы
 
 //Главная ---------------------------------------------
 app.get('/', function(req, res) {
-	authent(req).then(function(status) {
-		res.end(status);
-	}, function(err) {
-		res.end('Not autorized');
-	});
+	pages.list(req, res, {type: 7, page: 0});
 });
 //Регистрация
 app.get('/registration', function(req, res) {
@@ -30,17 +39,26 @@ app.get('/registration', function(req, res) {
 app.get('/login', function(req, res) {
 	render.jade(res, 'login');
 });
+//Список хабов с тегами
+app.get('/hubs', function(req, res) {
+	pages.hubs(req, res);
+});
+//Напомнить пароль
+app.get('/pass', function(req, res) {
+	render.jade(res, 'pass_remind');
+});
+//Изменить пароль
+app.get('/pass_change', function(req, res) {
+	if(req.user) {
+		render.jade(res, 'pass_change');
+	}
+	else {
+		render.error(res);
+	}
+});
 //Просмотр статьи
 app.get('/article/:name', function(req, res) {
 	pages.article(req, res);
-});
-//Просмотр всего черновика
-app.get('/draft', function(req, res) {
-	authent(req).then(function(status) {
-		pages.draft(req, res);
-	}, function(err) {
-		render.error(res);
-	});
 });
 //Просмотр последнего в хабе
 app.get('/hub/:name', function(req, res) {
@@ -66,47 +84,109 @@ app.get('/tag/:name/:num', function(req, res) {
 	var page_num = req.params.num;
 	pages.list(req, res, {type: 3, page: page_num});
 });
-//Профиль юзера
-app.get('/user/:name', function(req, res) {
-	//
-});
-//Свой профиль
-app.get('/profile', function(req, res) {
-	checking.user(req).then(function(user_id) {
-		pages.profile(res, user_id);
-	}, function(err) {
+//Просмотр всего черновика
+app.get('/draft', function(req, res) {
+	if(req.user) {
+		pages.list(req, res, {type: 4, page: 0});
+	}
+	else {
 		render.error(res);
-	});
+	}
 });
 //Просмотр статьи в черновике
 app.get('/draft/:name', function(req, res) {
-	checking.user(req).then(function(user_id) {
-		pages.draft_article(req, res, user_id);
-	}, function(err) {
+	if(req.user) {
+		pages.draft_article(req, res);
+	}
+	else {
 		render.error(res);
-	});
+	}
+});
+//Просмотр песочницы для админов
+app.get('/sandbox', function(req, res) {
+	if(req.user && req.user.status >= 3) {
+		pages.list(req, res, {type: 5, page: 0});
+	}
+	else {
+		render.error(res);
+	}
+});
+app.get('/sandbox/:num', function(req, res) {
+	if(req.user && req.user.status >= 3) {
+		var page_num = req.params.num;
+		pages.list(req, res, {type: 5, page: page_num});
+	}
+	else {
+		render.error(res);
+	}
+});
+//Личная лента юзера
+app.get('/roll', function(req, res) {
+	if(req.user) {
+		pages.list(req, res, {type: 6, page: 0});
+	}
+	else {
+		render.error(res);
+	}
+});
+app.get('/roll/:num', function(req, res) {
+	if(req.user) {
+		var page_num = req.params.num;
+		pages.list(req, res, {type: 6, page: page_num});
+	}
+	else {
+		render.error(res);
+	}
+});
+//Лента всех статей
+app.get('/page/:num', function(req, res) {
+	var page_num = req.params.num;
+	pages.list(req, res, {type: 7, page: page_num});
+});
+//Статья в песочнице
+app.get('/sandbox_item/:name', function(req, res) {
+	if(req.user && req.user.status >= 3) {
+		pages.sandbox(req, res);
+	}
+	else {
+		render.error(res);
+	}
+});
+//Профиль юзера
+app.get('/user/:name', function(req, res) {
+	pages.user(req, res);
+});
+//Свой профиль
+app.get('/profile', function(req, res) {
+	if(req.user) {
+		render.jade(res, 'profile', req.user);
+	}
+	else {
+		render.error(res);
+	}
 });
 //Создание ----------------------------
 //Создание статьи
 app.get('/create_article', function(req, res) {
-	authent(req).then(function(status) {
+	if(req.user) {
 		pages.create_article(res);
-	}, function(err) {
+	}
+	else {
 		render.error(res);
-	});
+	}
 });
 //Создание хаба
 app.get('/create_hub', function(req, res) {
-	authent(req).then(function(status) {
-		if(status == 4) {
-			render.jade(res, 'create_hub');
-		}
-		else {
-			render.error(res);
-		}
-	}, function(err) {
+	if(req.user && req.user.status == 4) {
+		render.jade(res, 'create_hub');
+	}
+	else {
 		render.error(res);
-	});
+	}
+});
+//Выход
+app.get('/exit', function(req, res) {
+	control.exit(req, res);
 });
 
 //POST-запросы ---------------------------------------------
@@ -121,48 +201,142 @@ app.post('/login', function(req, res) {
 })
 //Создание хаба
 app.post('/create_hub', function(req, res) {
-	authent(req).then(function(status) {
-		if(status == 4) {
-			control.hub(req, res);
-		}
-		else {
-			render.error(res);
-		}
-	}, function(err) {
+	if(req.user && req.user.status == 4) {
+		control.hub(req, res);
+	}
+	else {
 		render.error(res);
-	});
+	}
 });
 //Создание статьи
 app.post('/create_article', function(req, res) {
-	authent(req).then(function(status) {
-		control.create_article(req, res, status);
-	}, function(err) {
+	if(req.user) {
+		control.create_article(req, res);
+	}
+	else {
 		render.error(res);
-	});
+	}
 });
 //Операции с черновой статьёй
 app.post('/draft/:name', function(req, res) {
-	checking.user(req).then(function(user_id) {
-		control.draft(req, res, user_id);
-	}, function(err) {
+	if(req.user) {
+		control.draft(req, res);
+	}
+	else {
 		render.error(res);
-	});
+	}
 });
 //Отправка комментария
 app.post('/comment/:name', function(req, res) {
-	checking.user(req).then(function(user_id) {
-		control.comment(req, res, user_id);
-	}, function(err) {
+	if(req.user) {
+		control.comment(req, res);
+	}
+	else {
 		render.error(res);
-	});
+	}
 });
-//Редактирвоание профиля
+//Редактирование профиля
 app.post('/profile', function(req, res) {
-	checking.user(req).then(function(user_id) {
-		control.profile(req, res, user_id);
-	}, function(err) {
+	if(req.user) {
+		control.profile(req, res);
+	}
+	else {
 		render.error(res);
-	});
+	}
+});
+//Изменение рейтинга
+app.post('/rating/:type/:num', function(req, res) {
+	if(req.user) {
+		control.rating(req, res);
+	}
+	else {
+		render.error(res);
+	}
+});
+//Операции со статьями в песочнице
+app.post('/sandbox_item/:name', function(req, res) {
+	if(req.user && req.user.status >= 3) {
+		control.sandbox(req, res);
+	}
+	else {
+		render.error(res);
+	}
+});
+//Операции с тегами в hubs
+app.post('/hubs', function(req, res) {
+	if(req.user && req.user.status >= 3) {
+		control.hubs(req, res);
+	}
+	else {
+		render.error(res);
+	}
+});
+//Операции с паролем
+app.post('/pass', function(req, res) {
+	control.pass(req, res);
+});
+//Поиск
+app.post('/search', function(req, res) {
+	pages.search(req, res);
+});
+//Подписки -----------------------------------
+//Подписка и отписка на юзера
+app.post('/user/:name', function(req, res) {
+	if(req.user) {
+		control.subscribe(req, res, 1);
+	}
+	else {
+		render.error(res);
+	}
+});
+//Подписка и отписка на тег
+app.post('/tag/:name', function(req, res) {
+	if(req.user) {
+		control.subscribe(req, res, 2);
+	}
+	else {
+		render.error(res);
+	}
+});
+//Подписка и отписка на хаб
+app.post('/hub/:name', function(req, res) {
+	if(req.user) {
+		control.subscribe(req, res, 3);
+	}
+	else {
+		render.error(res);
+	}
+});
+//Бан
+app.post('/ban/:name', function(req, res) {
+	if(req.user && req.user.status >= 3) {
+		control.ban(req, res);
+	}
+	else {
+		render.error(res);
+	}
+});
+//Отправка статьи на переработку
+app.post('/article/:name', function(req, res) {
+	if(req.user && req.user.status >= 3) {
+		control.recicle(req, res);
+	}
+	else {
+		render.error(res);
+	}
+});
+//Повышение до админа и обратно
+app.post('/raise/:name', function(req, res) {
+	if(req.user && req.user.status == 4) {
+		control.raise(req, res);
+	}
+	else {
+		render.error(res);
+	}
+});
+//AJAX проверка имени и почты
+app.post('/check', function(req, res) {
+	checking.ajax(req);
 });
 
 //Служебные ---------------------------------------------

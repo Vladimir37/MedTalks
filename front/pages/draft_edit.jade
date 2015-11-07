@@ -2,7 +2,6 @@ extends basis/layout
 
 block content
 	form(method="post" enctype="multipart/form-data" action="/draft/" + data1.id)
-		//-input(type="hidden" name="type" value="4")
 		input(type="hidden" value=data1.images)#max_img
 		input(type="text" name="title" value=data1.title)
 		br

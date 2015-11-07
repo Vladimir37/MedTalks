@@ -1,0 +1,25 @@
+extends ../basis/layout
+
+block content
+	h1 Раздел «#{data1.name}»
+	//- Только авторизированным
+	- if(data3)
+		form(action="/hub/" + data1.name method="post")
+			//- Проверка подписанности
+			- var sub_hubs = JSON.parse(data3.profile.sub_hubs)
+			- if(sub_hubs.indexOf(data1.name) == -1)
+				input(type="submit" value="Подписаться")
+			- else
+				input(type="submit" value="Отписаться")
+	//- Перебор и рендер статей
+	- each item in data0
+		mixin article_short(item)
+	//- Постраничная навигация
+	- if(data2.current != 0)
+		- var prev = +data2.current - 1
+		a(href="/hub/" + data1.addr + '/' + prev)
+			input(type="button" value="Предыдущая")
+	- if(data2.current != data2.total)
+		- var next = +data2.current + 1
+		a(href="/hub/" + data1.addr + '/' + next)
+			input(type="button" value="Следующая")

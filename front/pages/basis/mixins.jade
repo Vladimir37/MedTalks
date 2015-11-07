@@ -1,7 +1,83 @@
-mixin article_full(article)
-	h1=data0.title
-	h2 Автор - #{data0.user.name}
-	h3 Хаб - #{data0.hub.name}
-	p Создано #{data0.updatedAt}
-	p Теги: #{data0.tags}
-	p!=data0.text
+//- Статья
+mixin article_full(article, user_data)
+	h1=article.title
+	h2 Автор - #{article.user.name}
+	h3 Хаб - #{article.hub.name}
+	b Рейтинг: #{article.rating}
+	- if(user_data)
+		- if(article.vote == 1)
+			form(action="/rating/articles/" + article.id method="post")
+				input(type="hidden" name="type" value="plus")
+				input(type="submit" value="Плюс")
+			form(action="/rating/articles/" + article.id method="post")
+				input(type="hidden" name="type" value="minus")
+				input(type="submit" value="Минус")
+		- else if(article.vote == 2)
+			h4 Вы не можете голосовать за себя
+		- else
+			h4 Вы уже голосовали
+	p Создано #{article.updatedAt}
+	p Теги: #{article.tags}
+	p!=article.text
+//- Статья в черновике
+mixin article_draft(article)
+	h1=article.title
+	h3 Хаб - #{article.hub.name}
+	p Создано #{article.updatedAt}
+	p Теги: #{article.tags}
+	p!=article.text
+//- Статья в песочнице
+mixin article_sandbox(article)
+	h1=article.title
+	h2 Автор - #{article.user.name}
+	h3 Хаб - #{article.hub.name}
+	p Создано #{article.updatedAt}
+	p Теги: #{article.tags}
+	p!=article.text
+	form(method="post")
+		input(type="hidden" name="action" value="1")
+		input(type="submit" value="Опубликовать")
+	form(method="post")
+		input(type="hidden" name="action" value="0")
+		textarea(name="reason" placeholder="Причины (при отклонении)")
+		br
+		input(type="submit" value="Отклонить")
+//- Краткая статья
+mixin article_short(article)
+	-if(article.text.length > 512)
+		- article.text = article.text.substr(0, 512) + '...'
+	h2=article.title
+		p Тэги - #{article.tags}
+		h3 Автор #{article.user.name}
+		p!=article.text
+		a(href="/article/" + article.id)
+			input(type="button" value="Читать полностью")
+		br
+//- Краткая статья в песочнице
+mixin article_short_sandbox(article)
+	-if(article.text.length > 512)
+		- article.text = article.text.substr(0, 512) + '...'
+	h2=article.title
+		p Тэги - #{article.tags}
+		h3 Автор #{article.user.name}
+		p!=article.text
+		a(href="/sandbox_item/" + article.id)
+			input(type="button" value="Читать полностью")
+		br
+//- Комментарий
+mixin comment(comment, user_data)
+	h4=comment.user.name
+	b=comment.rating
+	- if(user_data)
+		- if(comment.vote == 1)
+			form(action="/rating/comments/" + comment.id method="post")
+				input(type="hidden" name="type" value="plus")
+				input(type="submit" value="Плюс")
+			form(action="/rating/comments/" + comment.id method="post")
+				input(type="hidden" name="type" value="minus")
+				input(type="submit" value="Минус")
+		- else if(comment.vote == 2)
+			h5 Вы не можете голосовать за себя!
+		- else
+			h5 Вы уже голосовали!
+	p!=comment.text
