@@ -87,6 +87,7 @@ tables.comments = sequelize.define('comments', {
 	text: Sequelize.TEXT,
 	article: Sequelize.INTEGER,
 	answer: Sequelize.INTEGER,
+	author: Sequelize.INTEGER,
 	rating: {
 		type: Sequelize.INTEGER,
 		defaultValue: 0
