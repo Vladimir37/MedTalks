@@ -26,7 +26,6 @@ function renderJade(res, name) {
 			include: [{model: db.tables.users}]
 		}).then(function(comments) {
 			jade_data.comments = comments;
-			console.log(comments);
 			jade.renderFile('front/pages/' + name + '.jade', jade_data, function(err, result) {
 				if(err) {
 					console.log(err);
@@ -44,9 +43,21 @@ function renderJade(res, name) {
 	});
 };
 
+//Рендер Jade в роутере
+function routeJade(name, addition) {
+    return function(req, res) {
+        renderJade(res, name, addition);
+    };
+};
+
 //Ошибка 404
 function renderError(res) {
 	renderJade(res, 'errors/e404');
+};
+
+//Ошибка 404 (в роутере)
+function routeError(req, res) {
+    renderJade(res, 'errors/e404');
 };
 
 //Ошибка 500 (на сервере)
@@ -55,7 +66,8 @@ function serverError(res) {
 }
 
 //Рендер ресурсов
-function renderSource(res, name) {
+function renderSource(req, res) {
+    var name = req.url;
 	fs.readFile('front' + name, function(err, result) {
 		if(err) {
 			renderError(res);
@@ -67,6 +79,8 @@ function renderSource(res, name) {
 };
 
 exports.jade = renderJade;
+exports.route_jade = routeJade;
 exports.source = renderSource;
 exports.error = renderError;
+exports.route_error = routeError;
 exports.server = serverError;

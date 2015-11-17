@@ -114,25 +114,25 @@ function user_id(req) {
 };
 
 //AJAX проверка имени и почты
-function ajax(req) {
+function ajax(req, res) {
 	var type = req.body.type;
 	var data = req.body.data;
 	if(type == 'mail') {
 		mail_check(data).then(function() {
-			return 'Free';
+			res.end('Free');
 		}, function() {
-			return 'Not free';
+			res.end('Not free');
 		});
 	}
 	else if(type == 'name') {
 		name_check(data).then(function() {
-			return 'Free';
+			res.end('Free');
 		}, function() {
-			return 'Not free';
+			res.end('Not free');
 		});
 	}
 	else {
-		return 'Not free';
+		res.end('Not free');
 	}
 };
 

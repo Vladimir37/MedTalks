@@ -70,7 +70,8 @@ function registration(req, res) {
 };
 
 //Подтверждение регистрации
-function confirm(res, key) {
+function confirm(req, res) {
+	var key = req.params.key;
 	checking.confirm(key).then(function(user_id) {
 		//Определение статуса по конфигу
 		var user_status = 2;
@@ -414,53 +415,56 @@ function profile(req, res) {
 };
 
 //Подписка и отписка
-function subscribe(req, res, type) {
-	var target = req.params.name;
-	db.tables.profiles.findOne({where: {id: req.user.id}}).then(function(profile) {
-		var sub_type;
-		switch(type) {
-			case 1:
-				//На юзера
-				sub_type = 'sub_users';
-				break;
-			case 2:
-				//На тег
-				sub_type = 'sub_tags';
-				break;
-			case 3:
-				//На хаб
-				sub_type = 'sub_hubs';
-				break;
-			default:
-				//Ошибка: подписка без типа
-				render.server(err);
-				break;
-		};
-		var sub_needed = JSON.parse(profile[sub_type]);
-		var check_result = sub_needed.indexOf(target);
-		//Подписка
-		if(check_result == -1) {
-			sub_needed.push(target);
-			profile[sub_type] = JSON.stringify(sub_needed);
-			profile.save().then(function() {
-				render.jade(res, 'success/sub', target);
-			}, function(err) {
-				console.log(err);
-				render.server(res);
-			});
-		}
-		//Отписка
-		else {
-			sub_needed.splice(check_result, 1);
-			profile[sub_type] = JSON.stringify(sub_needed);
-			profile.save().then(function() {
-				render.jade(res, 'success/unsub', target);
-			});
-		}
-	}, function(err) {
-		console.log(err);
-		render.server(err);
-	});
+function subscribe(type) {
+    return function(req, res) {
+        var target = req.params.name;
+        db.tables.profiles.findOne({where: {id: req.user.id}}).then(function (profile) {
+            var sub_type;
+            switch (type) {
+                case 1:
+                    //На юзера
+                    sub_type = 'sub_users';
+                    break;
+                case 2:
+                    //На тег
+                    sub_type = 'sub_tags';
+                    break;
+                case 3:
+                    //На хаб
+                    sub_type = 'sub_hubs';
+                    break;
+                default:
+                    //Ошибка: подписка без типа
+                    render.server(err);
+                    break;
+            }
+            ;
+            var sub_needed = JSON.parse(profile[sub_type]);
+            var check_result = sub_needed.indexOf(target);
+            //Подписка
+            if (check_result == -1) {
+                sub_needed.push(target);
+                profile[sub_type] = JSON.stringify(sub_needed);
+                profile.save().then(function () {
+                    render.jade(res, 'success/sub', target);
+                }, function (err) {
+                    console.log(err);
+                    render.server(res);
+                });
+            }
+            //Отписка
+            else {
+                sub_needed.splice(check_result, 1);
+                profile[sub_type] = JSON.stringify(sub_needed);
+                profile.save().then(function () {
+                    render.jade(res, 'success/unsub', target);
+                });
+            }
+        }, function (err) {
+            console.log(err);
+            render.server(err);
+        });
+    }
 };
 
 //Изменения рейтинга
