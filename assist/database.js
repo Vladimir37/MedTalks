@@ -65,6 +65,7 @@ tables.articles = sequelize.define('articles', {
 	text: Sequelize.TEXT,
 	tags: Sequelize.TEXT,
 	author: Sequelize.INTEGER,
+    hubId: Sequelize.INTEGER,
 	status: Sequelize.INTEGER,
 	rating: {
 		type: Sequelize.INTEGER,
@@ -118,20 +119,23 @@ tables.profiles = sequelize.define('profiles', {
 	sub_tags: Sequelize.TEXT
 });
 
-//Ассоциации
-//Авторы коментов
-tables.comments.belongsTo(tables.users, {foreignKey: 'author'});
-//Авторы статей
-tables.articles.belongsTo(tables.users, {foreignKey: 'author'});
-//Хабы статей
-tables.articles.belongsTo(tables.hubs, {foreignKey: 'hubId'});
-//Профили с юзерами
-tables.users.hasOne(tables.profiles, {foreignKey: 'id'});
-
 //Синхронизация и создание всех таблиц
+var count = 0;
 for(table in tables) {
-	tables[table].sync({forsed: true}).then(function(result) {
+	tables[table].sync().then(function(result) {
 		console.log('Таблица ' + result.name + ' успешно синхронизирована');
+        count++;
+        if(count == 5) {
+            //Ассоциации
+            //Авторы коментов
+            tables.comments.belongsTo(tables.users, {foreignKey: 'author'});
+            //Авторы статей
+            tables.articles.belongsTo(tables.users, {foreignKey: 'author'});
+            //Хабы статей
+            tables.articles.belongsTo(tables.hubs, {foreignKey: 'hubId'});
+            //Профили с юзерами
+            tables.users.hasOne(tables.profiles, {foreignKey: 'id'});
+        }
 		}, function(err) {
 		console.log('Ошибка синхронизации: ' + err);
 	});
