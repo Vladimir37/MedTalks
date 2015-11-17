@@ -1,3 +1,5 @@
+var render = require('../render');
+
 //Проверка статуса юзера
 function status(need_status) {
     return function(req, res, next) {

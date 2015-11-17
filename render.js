@@ -46,26 +46,12 @@ function renderJade(res, name) {
 
 //Ошибка 404
 function renderError(res) {
-	jade_data = {};
-	for(var i = 0; i < arguments.length - 1; i++) {
-		jade_data['data' + i] = arguments[i + 1];
-	};
-	res.writeHead(404, {'Content-Type': 'text/html; charset=utf-8'});
-	jade.renderFile('front/pages/errors/e404.jade', jade_data, function(err, result) {
-		res.end(result);
-	});
+	renderJade(res, 'errors/e404');
 };
 
 //Ошибка 500 (на сервере)
 function serverError(res) {
-	jade_data = {};
-	for(var i = 0; i < arguments.length - 1; i++) {
-		jade_data['data' + i] = arguments[i + 1];
-	};
-	res.writeHead(500, {'Content-Type': 'text/html; charset=utf-8'});
-	jade.renderFile('front/pages/errors/eServer.jade', jade_data, function(err, result) {
-		res.end(result);
-	});
+	renderJade(res, 'errors/eServer');
 }
 
 //Рендер ресурсов
