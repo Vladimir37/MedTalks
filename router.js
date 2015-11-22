@@ -29,7 +29,7 @@ app.use(function (req, res, next) {
 //GET-запросы
 
 //Главная ---------------------------------------------
-app.get('/', pages.list({type: 7, page: 0}));
+app.get('/', pages.list(7));
 //Регистрация
 app.get('/registration', render.route_jade('registration'));
 //Авторизация
@@ -43,32 +43,32 @@ app.get('/pass_change', status(0), render.route_jade('pass_change'));
 //Просмотр статьи
 app.get('/article/:name', pages.article);
 //Просмотр последнего в хабе
-app.get('/hub/:name', pages.list({type: 1, page: 0}));
-app.get('/hub/:name/:num', pages.list({type: 1, page: req.params.num}));
+app.get('/hub/:name', pages.list(1));
+app.get('/hub/:name/:num', pages.list(1));
 //Просмотр статей за авторством
-app.get('/author/:name', pages.list({type: 2, page: 0}));
-app.get('/author/:name/:num', pages.list({type: 2, page: req.params.num}));
+app.get('/author/:name', pages.list(2));
+app.get('/author/:name/:num', pages.list(2));
 //Просмотр статей по тегу
-app.get('/tag/:name', pages.list({type: 3, page: 0}));
-app.get('/tag/:name/:num', pages.list({type: 3, page: page_num}));
+app.get('/tag/:name', pages.list(3));
+app.get('/tag/:name/:num', pages.list(3));
 //Просмотр всего черновика
-app.get('/draft', status(0), pages.list({type: 4, page: 0}));
+app.get('/draft', status(0), pages.list(4));
 //Просмотр статьи в черновике
 app.get('/draft/:name', status(0), pages.draft_article);
 //Просмотр песочницы для админов
-app.get('/sandbox', status(3), pages.list({type: 5, page: 0}));
-app.get('/sandbox/:num', status(3), pages.list({type: 5, page: req.params.num}));
+app.get('/sandbox', status(3), pages.list(5));
+app.get('/sandbox/:num', status(3), pages.list(5));
 //Личная лента юзера
-app.get('/roll', status(0), pages.list({type: 6, page: 0}));
-app.get('/roll/:num', status(0), pages.list({type: 6, page: req.params.num}));
+app.get('/roll', status(0), pages.list(6));
+app.get('/roll/:num', status(0), pages.list(6));
 //Лента всех статей
-app.get('/page/:num', pages.list({type: 7, page: req.params.num}));
+app.get('/page/:num', pages.list(7));
 //Статья в песочнице
 app.get('/sandbox_item/:name', status(3), pages.sandbox);
 //Профиль юзера
 app.get('/user/:name', pages.user);
 //Свой профиль
-app.get('/profile', status(0), render.route_jade('profile', req.user));
+app.get('/profile', status(0), render.route_jade('profile', true));
 //Создание ----------------------------
 //Создание статьи
 app.get('/create_article', status(0), pages.create_article);

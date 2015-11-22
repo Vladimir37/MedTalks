@@ -98,8 +98,12 @@ function draft_article(req, res) {
 };
 
 //Рендер списка статей
-function list(params) {
+function list(num_type) {
 	return function(req, res) {
+        var params = {
+            type: num_type,
+            page: req.params.num || 0
+        };
         var target_name = req.params.name;
         var start_article = params.page * 10;
         //По хабу

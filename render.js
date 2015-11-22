@@ -46,7 +46,12 @@ function renderJade(res, name) {
 //Рендер Jade в роутере
 function routeJade(name, addition) {
     return function(req, res) {
-        renderJade(res, name, addition);
+		if(addition) {
+            renderJade(res, name, req.user);
+        }
+        else {
+            renderJade(res, name);
+        }
     };
 };
 
